@@ -35,33 +35,32 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
     if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
     if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'делать нечего'; then rm $HOME/upgrade.yay; fi; fi
     if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
-    if compgen -G "$HOME/upgrade.*" > /dev/null; 
-      # --------------------------------------------------------------------------------------------
-      then echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
-        if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; 
-          then echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
-            if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
-              then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
-              else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
-            fi
-        fi
-        # Конец условия Сравнить конфиги pacnew? 
-        echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
-        if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; 
-          then echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
-        fi
-        # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-        echo -e "\n"; sudo rkhunter --propupd 2> /dev/null
-        /home/kostya/my_scripts/rkhunter.sh ; echo -e "\n";
-        notify-send -t 29000 -i face-plain "      ВНИМАНИЕ!!!      " "  Требуется <b>Вмешательство</b> "; canberra-gtk-play -i dialog-warning
-        echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
-        if [[ "$kerny" = [yYlLдД] ]]; 
-          then echo -e "\n"; echo "В системе установлены следующие ядра:"
-            pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
-            echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
-            cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
-          else echo -e "\n";
-        fi
+    # --------------------------------------------------------------------------------------------
+    if compgen -G "$HOME/upgrade.*" > /dev/null; then echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
+      if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; 
+        then echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
+          if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
+            then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
+            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
+          fi
+      fi
+      # Конец условия Сравнить конфиги pacnew? 
+      echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
+      if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; 
+        then echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
+      fi
+      # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
+      echo -e "\n"; sudo rkhunter --propupd 2> /dev/null
+      /home/kostya/my_scripts/rkhunter.sh ; echo -e "\n";
+      notify-send -t 29000 -i face-plain "      ВНИМАНИЕ!!!      " "  Требуется <b>Вмешательство</b> "; canberra-gtk-play -i dialog-warning
+      echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
+      if [[ "$kerny" = [yYlLдД] ]]; 
+        then echo -e "\n"; echo "В системе установлены следующие ядра:"
+          pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
+          echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
+          cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
+        else echo -e "\n";
+      fi
     fi
     # Конец условия Необходимости постобработки -------------------------------------------------
   else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
