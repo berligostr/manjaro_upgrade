@@ -52,7 +52,8 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
       # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
       echo -e "\n"; sudo rkhunter --propupd 2> /dev/null
       /home/kostya/my_scripts/rkhunter.sh ; echo -e "\n";
-      notify-send -t 29000 -i face-plain "   ВНИМАНИЕ!!! Скрипт  " "   Требует <b>Вмешательства</b>  "; canberra-gtk-play -i dialog-warning
+      echo "Нажмите любую клавишу, чтобы продолжить"
+      while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
       echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
       if [[ "$kerny" = [yYlLдД] ]]; 
         then echo -e "\n"; echo "В системе установлены следующие ядра:"
