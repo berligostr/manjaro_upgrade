@@ -19,6 +19,8 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
     ( pamac upgrade --force-refresh && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
     # pamac upgrade --force-refresh && echo "Запись EOF" | tee -i $HOME/upgrade.pamac; 
     # ---------------------------------------------------------------------------------------------
+    echo "Нажмите любую клавишу, чтобы продолжить"
+    while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
     echo -e "\n"; read -n 1 -p "Обновить через AURхелперы? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; 
       then echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
