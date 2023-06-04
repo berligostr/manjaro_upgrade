@@ -64,6 +64,8 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
           cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
         else echo -e "\n";
       fi
+      echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
+      checkrebuild | grep -v zoom
     fi
     # Конец условия Необходимости постобработки -------------------------------------------------
   else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
