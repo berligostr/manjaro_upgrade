@@ -2,12 +2,12 @@
 # Удаление блокировки баз при ее наличии
 if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
-echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate;
-if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
+#echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate;
+#if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
 # ---------------------------------------------------------------------------------------------
 if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -e "\n"; echo -e "База clamav создана более недели назад!"; fi
-echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
-if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo /home/kostya/my_scripts/update_clamav.sh; fi
+#echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
+#if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo /home/kostya/my_scripts/update_clamav.sh; fi
 # ---------------------------------------------------------------------------------------------
 echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
 if [[ "$update" = "" || "$update" = [yYlLдД] ]]; 
@@ -17,9 +17,8 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
     # Если терминал завис нужно нажать Ctrl+c
     echo -e "\n"; echo -e "Если терминал завис нужно нажать Ctrl+c"; echo -e "\n";
     ( pamac upgrade --force-refresh && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-    # pamac upgrade --force-refresh && echo "Запись EOF" | tee -i $HOME/upgrade.pamac; 
     # ---------------------------------------------------------------------------------------------
-    echo "Нажмите любую клавишу, чтобы продолжить"
+    echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
     while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
     echo -e "\n"; read -n 1 -p "Обновить через AURхелперы? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; 
@@ -29,7 +28,7 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syua | tee $HOME/upgrade.paru; fi
         if [[ "$bekap" = [yYlLдД] ]]; then echo -e "\n"; sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
     fi
-    echo -e "\n";
+    #echo -e "\n";
     # ---------------------------------------------------------------------------------------------
     #    echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
     #    if [[ "$flat" = [yY] ]]; then echo -e "\n"; flatpak update; echo -e "\n"; fi
@@ -53,8 +52,8 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
       fi
       # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
       echo -e "\n"; sudo rkhunter --propupd 2> /dev/null
-      /home/kostya/my_scripts/rkhunter.sh ; echo -e "\n";
-      echo "Нажмите любую клавишу, чтобы продолжить"
+      /home/kostya/my_scripts/rkhunter.sh ; 
+      echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
       while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
       echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
       if [[ "$kerny" = [yYlLдД] ]]; 
@@ -64,8 +63,11 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
           cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
         else echo -e "\n";
       fi
-      echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
-      checkrebuild | grep -v zoom
+      echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
+      if [[ "$pac" = [yYlLдД] ]]; then        
+        echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
+        checkrebuild | grep -v zoom
+      fi  
     fi
     # Конец условия Необходимости постобработки -------------------------------------------------
   else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
