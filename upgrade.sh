@@ -15,7 +15,7 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
     if [[ "$bekap" = [yYlLдД] ]]; then echo -e "\n"; sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
     #  pamac upgrade --forse-refresh; 
     # Если терминал завис нужно нажать Ctrl+c
-    echo -e "\n"; echo -e "Если терминал завис нужно нажать Ctrl+c"; echo -e "\n";
+    echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; 
     ( pamac upgrade --force-refresh && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
     # ---------------------------------------------------------------------------------------------
     echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
@@ -26,7 +26,7 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
         if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay | tee $HOME/upgrade.yay; fi
         echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syua | tee $HOME/upgrade.paru; fi
-        if [[ "$bekap" = [yYlLдД] ]]; then echo -e "\n"; sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
+        if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
     fi
     #echo -e "\n";
     # ---------------------------------------------------------------------------------------------
@@ -58,10 +58,9 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
       echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
       if [[ "$kerny" = [yYlLдД] ]]; 
         then echo -e "\n"; echo "В системе установлены следующие ядра:"
-          pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
-          echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
-          cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
-        else echo -e "\n";
+        pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
+        echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
+        cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
       fi
       echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
       if [[ "$pac" = [yYlLдД] ]]; then        
