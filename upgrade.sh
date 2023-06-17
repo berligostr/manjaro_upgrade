@@ -9,13 +9,13 @@ if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -
 #echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
 #if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo /home/kostya/my_scripts/update_clamav.sh; fi
 # ---------------------------------------------------------------------------------------------
-echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
-if [[ "$update" = "" || "$update" = [yYlLдД] ]]; 
-  then echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
+#echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
+#if [[ "$update" = "" || "$update" = [yYlLдД] ]]; then 
+echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
     if [[ "$bekap" = [yYlLдД] ]]; then echo -e "\n"; sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
     #  pamac upgrade --forse-refresh; 
     # Если терминал завис нужно нажать Ctrl+c
-    echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; 
+    echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
     ( pamac upgrade --force-refresh && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
     # ---------------------------------------------------------------------------------------------
     echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
@@ -70,7 +70,7 @@ if [[ "$update" = "" || "$update" = [yYlLдД] ]];
     fi
     # Конец условия Необходимости постобработки -------------------------------------------------
   else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
-fi
+#fi
 # Конец условия Обновить установленные пакеты?
 echo -e "\n";
 # Удаление логов ------------------------------------------------------------------------------
