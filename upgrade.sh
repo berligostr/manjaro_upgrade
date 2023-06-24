@@ -54,11 +54,6 @@ echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед об�
       if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; 
         then echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
       fi
-      # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-      echo -e "\n"; sudo rkhunter --propupd 2> /dev/null
-      /home/kostya/my_scripts/rkhunter.sh ; 
-      echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
-      while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
       echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
       if [[ "$kerny" = [yYlLдД] ]]; 
         then echo -e "\n"; echo "В системе установлены следующие ядра:"
@@ -72,11 +67,19 @@ echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед об�
         checkrebuild | grep -v zoom
       fi
       echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
-       if [[ "$syr" = [yYlLдД] ]]; then        
+      if [[ "$syr" = [yYlLдД] ]]; then        
         echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
         pamac list -o
         echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; echo -e "\n";
         if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
+      fi
+      # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
+      echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; echo -e "\n";
+      if [[ "$rkh" = [yYlLдД] ]]; then 
+        sudo rkhunter --propupd 2> /dev/null
+        /home/kostya/my_scripts/rkhunter.sh ; 
+        echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+        while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
       fi
     fi
     # Конец условия Необходимости постобработки -------------------------------------------------
