@@ -6,8 +6,8 @@ if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -
 # Удаление блокировки баз при ее наличии
 if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
-echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; echo -e "\n"
-if [[ "$cupdate" = [yYlLдД] ]]; then pamac checkupdates -a; fi
+echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; 
+if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
 # ---------------------------------------------------------------------------------------------
 bekaplast=$(find /mnt/sdb/sdb6/timeshift/snapshots -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
 echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast
