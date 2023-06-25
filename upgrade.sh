@@ -7,12 +7,12 @@ if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -
 if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
 echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; echo -e "\n"
-if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
+if [[ "$cupdate" = [yYlLдД] ]]; then pamac checkupdates -a; fi
 # ---------------------------------------------------------------------------------------------
 bekaplast=$(find /mnt/sdb/sdb6/timeshift/snapshots -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
 echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast
 echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
-if [[ "$bekap" = [yYlLдД] ]]; then echo -e "\n"; sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
+if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
 # echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
 # if [[ "$update" = "" || "$update" = [yYlLдД] ]]; then 
 # pamac upgrade --forse-refresh; 
@@ -76,7 +76,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     if [[ "$syr" = [yYlLдД] ]]; then        
       echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
       pamac list -o
-      echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; echo -e "\n";
+      echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
       if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
     fi
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
@@ -92,9 +92,11 @@ fi
 # Конец условия Необходимости постобработки после обновления пакетов репозиториев ----------------------------------------------
 #  else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
 #fi
+# Удаление блокировки баз при ее наличии
+if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
-  echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; echo -e "\n";
+  echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --enable-downgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
