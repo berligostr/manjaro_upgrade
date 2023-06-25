@@ -99,16 +99,16 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   ( pamac upgrade --enable-downgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
-    ( pamac upgrade --force-refresh --enable-downgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
+    ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi  
   echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
   while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
   echo -e "\n"; read -n 1 -p "Обновить через AURхелперы? [y/N]: " upda; 
   if [[ "$upda" = [yYlLдД] ]]; then  
     echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
-    if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyuu --aur | tee $HOME/upgrade.yay; fi
+    if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyu --aur | tee $HOME/upgrade.yay; fi
     echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
-    if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu --aur | tee $HOME/upgrade.paru; fi
+    if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyu --aur | tee $HOME/upgrade.paru; fi
   fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'делать нечего'; then rm $HOME/upgrade.yay; fi; fi
