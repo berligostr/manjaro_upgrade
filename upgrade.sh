@@ -104,7 +104,7 @@ echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " upd
 if [[ "$updaur" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --enable-downgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+  ( pamac upgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
