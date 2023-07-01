@@ -10,7 +10,7 @@ echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cu
 if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
 # ---------------------------------------------------------------------------------------------
 bekaplast=$(find /mnt/sdb/sdb6/timeshift/snapshots -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
-echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast
+echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
 echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
 if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
 # echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
@@ -69,7 +69,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then 
-      if [ -n "$(checkrebuild | grep -v zoom)" ]; 
+      if [ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]; 
         then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
           checkrebuild | grep -v zoom
         else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
@@ -77,7 +77,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     fi
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
     if [[ "$syr" = [yYlLдД] ]]; then  
-      if [ -n "$(pamac list -o)" ];
+      if [ -n "$(pamac list -o | head -n 1)" ];
         then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
@@ -138,7 +138,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then 
-      if [ -n "$(checkrebuild | grep -v zoom)" ]; 
+      if [ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]; 
         then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
           checkrebuild | grep -v zoom
         else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
@@ -146,7 +146,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     fi
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
     if [[ "$syr" = [yYlLдД] ]]; then  
-      if [ -n "$(pamac list -o)" ];
+      if [ -n "$(pamac list -o | head -n 1)" ];
         then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
