@@ -78,7 +78,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
     if [[ "$syr" = [yYlLдД] ]]; then  
       if [ -n "$(pamac list -o | head -n 1)" ];
-        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
+        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
           if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
@@ -144,10 +144,10 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
       fi
     fi
-    echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
-    if [[ "$syr" = [yYlLдД] ]]; then  
+    echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syro;  
+    if [[ "$syro" = [yYlLдД] ]]; then  
       if [ -n "$(pamac list -o | head -n 1)" ];
-        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!!!): "; echo -e "\n"; 
+        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
           if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
