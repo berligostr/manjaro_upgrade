@@ -121,7 +121,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
-  #if compgen -G "$HOME/upgrade.*" > /dev/null; then 
+  if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
     if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; then 
       echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
@@ -161,7 +161,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
       echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
       while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
     fi
-  #fi
+  fi
 fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
