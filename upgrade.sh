@@ -68,25 +68,25 @@ if [[ "$updrep" = [yYlLдД] ]]; then
       cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
-    if [[ "$pac" = [yYlLдД] ]]; then 
+    if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
       if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
-        then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; checkrebuild | grep -v zoom ;
-        else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
+        then echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; checkrebuild | grep -v zoom ;
+        else echo "Пакетов из AUR для пересборки нет."; 
       fi
     fi
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
-    if [[ "$syr" = [yYlLдД] ]]; then  
+    if [[ "$syr" = [yYlLдД] ]]; then echo -e "\n"; 
       if [[ -n "$(pamac list -o | head -n 1)" ]];
-        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
+        then echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
-          if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
+          if [[ "$syrd" = [yYlLдД] ]]; then echo -e "\n"; pamac remove -o ; fi
         else echo -e "\n"; echo "Пакеты сироты отсутствуют."; echo -e "\n";
       fi
     fi
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-    echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; echo -e "\n";
-    if [[ "$rkh" = [yYlLдД] ]]; then 
+    echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh;
+    if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
       sudo rkhunter --propupd 2> /dev/null
       /home/kostya/my_scripts/rkhunter.sh ; 
       echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
@@ -136,26 +136,26 @@ if [[ "$updaur" = [yYlLдД] ]]; then
       echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
-    if [[ "$pac" = [yYlLдД] ]]; then 
+    if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
       if [ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]; 
-        then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
+        then echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
           checkrebuild | grep -v zoom
-        else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
+        else echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
       fi
     fi
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syro;  
-    if [[ "$syro" = [yYlLдД] ]]; then  
+    if [[ "$syro" = [yYlLдД] ]]; then echo -e "\n"; 
       if [ -n "$(pamac list -o | head -n 1)" ];
-        then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
+        then echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
-          if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
-        else echo -e "\n"; echo "Пакеты сироты отсутствуют."; echo -e "\n";
+          if [[ "$syrd" = [yYlLдД] ]]; then echo -e "\n"; pamac remove -o ; fi
+        else echo "Пакеты сироты отсутствуют."; 
       fi
     fi
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
     echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; echo -e "\n";
-    if [[ "$rkh" = [yYlLдД] ]]; then 
+    if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
       sudo rkhunter --propupd 2> /dev/null
       /home/kostya/my_scripts/rkhunter.sh ; 
       echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
