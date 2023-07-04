@@ -46,7 +46,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
-  if compgen -G "$HOME/upgrade.*" > /dev/null; then 
+  #if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
     if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; then 
       echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
@@ -69,22 +69,21 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then 
-      if [ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]; 
-        then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
-          checkrebuild | grep -v zoom
+      if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
+        then echo -e "\n"; echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; checkrebuild | grep -v zoom ;
         else echo -e "\n"; echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
       fi
     fi
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
     if [[ "$syr" = [yYlLдД] ]]; then  
-      if [ -n "$(pamac list -o | head -n 1)" ];
+      if [[ -n "$(pamac list -o | head -n 1)" ]];
         then echo -e "\n"; echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
           pamac list -o
           echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
           if [[ "$syrd" = [yYlLдД] ]]; then pamac remove -o ; fi
         else echo -e "\n"; echo "Пакеты сироты отсутствуют."; echo -e "\n";
       fi
-    fi
+    #fi
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
     echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; echo -e "\n";
     if [[ "$rkh" = [yYlLдД] ]]; then 
