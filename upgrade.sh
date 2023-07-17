@@ -29,7 +29,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # ---------------------------------------------------------------------------------------------
   echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
   while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-  echo -e "\n"; read -n 1 -p "Обновить через AURхелперы? [y/N]: " upda; 
+  echo -e "\n"; read -n 1 -p "Обновить пакеты из репозиториев через AURхелперы? [y/N]: " upda; 
   if [[ "$upda" = [yYlLдД] ]]; then
     echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
     if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyuu --repo | tee $HOME/upgrade.yay; fi
@@ -110,7 +110,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   fi  
   echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
   while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-  echo -e "\n"; read -n 1 -p "Обновить через AURхелперы? [y/N]: " upda; 
+  echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR через AURхелперы? [y/N]: " upda; 
   if [[ "$upda" = [yYlLдД] ]]; then  
     echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
     if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyu --aur | tee $HOME/upgrade.yay; fi
