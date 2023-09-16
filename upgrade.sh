@@ -6,8 +6,9 @@ if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -
 # Удаление блокировки баз при ее наличии
 if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
-echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; 
-if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
+#echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; 
+#if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
+echo -e "\n"; pamac checkupdates -a
 # ---------------------------------------------------------------------------------------------
 bekaplast=$(find /mnt/sdb/sdb6/timeshift/snapshots -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
 echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
@@ -22,6 +23,8 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов репозиториев, сборка AUR не обновляется!!!."; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+  echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
@@ -103,7 +106,9 @@ echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " upd
 if [[ "$updaur" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+  ( pamac upgrade --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
+  echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
@@ -122,8 +127,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
-    if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; then 
+    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
+    if [[ "$diff" = [yYlLдД] ]]; then 
       echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
       if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
         then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
@@ -131,8 +136,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
       fi
     fi
     # Конец условия Сравнить конфиги pacnew? 
-    echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
-    if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; then
+    echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [y/N]: " restart;
+    if [[ "$restart" = [yYlLдД] ]]; then
       echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
