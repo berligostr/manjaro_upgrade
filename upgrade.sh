@@ -1,6 +1,6 @@
 #!/bin/bash
 if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -e "\n"; 
-  echo -e "База clamav создана более недели назад!"; echo -e "\n"; stat /var/lib/clamav/daily.cvd | grep Создан ; 
+  echo -e "База clamav создана более недели назад!"; echo -e "\n"; stat /var/lib/clamav/daily.cvd | grep Модифицирован ; 
   echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
   if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo /home/kostya/my_scripts/update_clamav.sh; fi
 fi
