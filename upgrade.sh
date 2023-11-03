@@ -161,7 +161,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
       fi
     fi
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-    echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; echo -e "\n";
+    echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; 
     if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
       sudo rkhunter --propupd 2> /dev/null
       /home/kostya/my_scripts/rkhunter.sh ; 
