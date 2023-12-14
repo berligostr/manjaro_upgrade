@@ -197,6 +197,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
