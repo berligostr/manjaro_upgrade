@@ -3,7 +3,7 @@ echo -e "Этот скрипт проверяет наличие обновле�
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: "
 echo -e "clamav, timeshift, timeshift-autosnap-manjaro,yay, paru, meld, needrestart и rkhunter."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
-echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты? [y/N]: " inst;
+echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pamac install --no-confirm clamav timeshift timeshift-autosnap-manjaro yay meld needrestart rkhunter 
   pamac build --no-confirm paru-bin 
@@ -27,6 +27,7 @@ if [[ "$inst" = [yYlLдД] ]]; then
     echo "stat /var/lib/clamav/daily.cvd | grep Модифицирован " >> $HOME/my_scripts/update_clamav.sh
     chmod +x $HOME/my_scripts/update_clamav.sh
   fi
+  timeshift-launcher
 fi
 package="clamav"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; 
@@ -48,7 +49,9 @@ echo -e "\n"; echo -e "Проверка наличия обновлений:"; e
 package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; 
   then
-    bekaplast=$(find /mnt/sdb/sdb6/timeshift/snapshots -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
+    timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
+    timesfile="$timesmount/timeshift/snapshots"
+    bekaplast=$(find $timesfile -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
     echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
     package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; 
