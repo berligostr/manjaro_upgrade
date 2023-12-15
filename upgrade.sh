@@ -25,6 +25,8 @@ if [[ "$inst" = [yYlLдД] ]]; then
     echo "wget https://packages.microsoft.com/clamav/daily.cvd -O /var/lib/clamav/daily.cvd " >> $HOME/my_scripts/update_clamav.sh
     echo "wget https://packages.microsoft.com/clamav/bytecode.cvd -O /var/lib/clamav/bytecode.cvd " >> $HOME/my_scripts/update_clamav.sh
     echo "stat /var/lib/clamav/daily.cvd | grep Модифицирован " >> $HOME/my_scripts/update_clamav.sh
+    echo "systemctl start clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
+    echo "systemctl restart clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
     chmod +x $HOME/my_scripts/update_clamav.sh
   fi
   timeshift-launcher
