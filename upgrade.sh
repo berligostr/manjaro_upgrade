@@ -92,6 +92,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         # if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
       fi
   fi
+  if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --no-aur ; fi
   # echo -e "\n";
   # ---------------------------------------------------------------------------------------------
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
@@ -196,6 +197,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyu --aur | tee $HOME/upgrade.paru; fi
       fi
   fi
+  if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
