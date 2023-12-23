@@ -1,7 +1,8 @@
 #!/bin/bash
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: "
-echo -e "clamav, timeshift, timeshift-autosnap-manjaro,yay, paru, meld, needrestart и rkhunter."
+echo -e "clamav, timeshift, timeshift-autosnap-manjaro,yay, meld, needrestart и rkhunter."
+echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
@@ -19,8 +20,8 @@ if [[ "$inst" = [yYlLдД] ]]; then
   if [ -n "${check}" ] ; then echo -e "needrestart установлен" ; else pamac install --no-confirm needrestart ; fi
   package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then echo -e "rkhunter установлен" ; else pamac install --no-confirm rkhunter ; fi 
-  package="paru-bin"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "paru-bin установлен" ; else pamac build --no-confirm paru-bin ; fi 
+  ; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  #if [ -n "${check}" ] ; then echo -e "paru-bin установлен" ; else pamac build --no-confirm paru-bin ; fi 
     if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     mkdir -p $HOME/my_scripts
     touch $HOME/my_scripts/rkhunter.sh
