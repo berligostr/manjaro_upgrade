@@ -20,7 +20,7 @@ if [[ "$inst" = [yYlLдД] ]]; then
   if [ -n "${check}" ] ; then echo -e "needrestart установлен" ; else pamac install --no-confirm needrestart ; fi
   package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then echo -e "rkhunter установлен" ; else pamac install --no-confirm rkhunter ; fi 
-  ; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  #package="paru-bin"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   #if [ -n "${check}" ] ; then echo -e "paru-bin установлен" ; else pamac build --no-confirm paru-bin ; fi 
     if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     mkdir -p $HOME/my_scripts
