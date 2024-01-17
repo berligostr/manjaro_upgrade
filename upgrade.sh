@@ -57,7 +57,7 @@ if [ -n "${check}" ] ;
 fi
 # ---------------------------------------------------------------------------------------------
 # Удаление блокировки баз при ее наличии
-if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
+if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
 #echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; 
 #if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
@@ -107,7 +107,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         # if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
       fi
   fi
-  if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --no-aur ; fi
+  #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --no-aur ; fi
   # echo -e "\n";
   # ---------------------------------------------------------------------------------------------
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
@@ -189,7 +189,7 @@ fi
 #  else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
 #fi
 # Удаление блокировки баз при ее наличии
-if [[ -f /var/lib/pacman/db.lck ]]; then sudo rm /var/lib/pacman/db.lck; fi
+if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/db.lck; fi
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
@@ -214,7 +214,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyu --aur | tee $HOME/upgrade.paru; fi
       fi
   fi
-  if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
+  #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
@@ -277,6 +277,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     fi
   fi
 fi
+if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --aur ; fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
 package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
