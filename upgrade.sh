@@ -66,7 +66,7 @@ echo -e "\n"; echo -e "Проверка наличия обновлений:"; e
 package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; 
   then
-    timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
+    echo -e "\n"; timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
     timesfile="$timesmount/timeshift/snapshots"
     bekaplast=$(find $timesfile -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
     echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
@@ -277,7 +277,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     fi
   fi
 fi
-if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --aur ; fi
+if [[ ! "$update" = [yYlLдД] ]]; then echo -e "\n"; pamac upgrade --force-refresh --enable-downgrade --aur ; fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
 package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
