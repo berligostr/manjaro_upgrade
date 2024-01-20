@@ -277,7 +277,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     fi
   fi
 fi
-if [[ ! "$update" = [yYlLдД] ]]; then echo -e "\n"; pamac upgrade --force-refresh --enable-downgrade --aur ; fi
+#if [[ ! "$update" = [yYlLдД] ]]; then echo -e "\n"; pamac upgrade --force-refresh --enable-downgrade --aur ; fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
 package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
