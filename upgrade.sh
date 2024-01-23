@@ -64,18 +64,20 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; echo -e "Проверка наличия обновлений:"; echo -e "\n"; pamac checkupdates -a
 # ---------------------------------------------------------------------------------------------
 package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-if [ -n "${check}" ] ; 
-  then
-    echo -e "\n"; timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
-    timesfile="$timesmount/timeshift/snapshots"
-    bekaplast=$(find $timesfile -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
-    echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
-    package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    if [ -n "${check}" ] ; 
-      then
+if [ -n "${check}" ] ; then
+  if ! pgrep 'timeshift'>null; 
+    then
+      echo -e "\n"; timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
+      timesfile="$timesmount/timeshift/snapshots"
+      bekaplast=$(find $timesfile -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
+      echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
+      package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+      if [ -n "${check}" ] ; then
         echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
         if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
-    fi
+      fi
+    else echo -e "\n"; echo -e "Сейчас невозможно определить последний бэкап, так как работает timeshift"
+  fi  
 fi
 # echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
 # if [[ "$update" = "" || "$update" = [yYlLдД] ]]; then 
