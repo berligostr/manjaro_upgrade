@@ -1,11 +1,13 @@
 #!/bin/bash
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: "
-echo -e "clamav, timeshift, timeshift-autosnap-manjaro,yay, meld, needrestart и rkhunter."
+echo -e "rebuild-detector, clamav, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart и rkhunter."
 echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
+  package="rebuild-detector"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  if [ -n "${check}" ] ; then echo -e "rebuild-detector установлен" ; else pamac install --no-confirm rebuild-detector ; fi
   package="clamav"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then echo -e "clamav установлен" ; else pamac install --no-confirm clamav ; fi
   package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
