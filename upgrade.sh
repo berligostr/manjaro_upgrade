@@ -4,28 +4,18 @@ echo -e "Для полноценной работы скрипта необхо�
 echo -e "rebuild-detector, clamav, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart и rkhunter."
 echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
+
+pack () 
+{
+  package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
+  if [ -n "${check}" ] ; then echo -e "$1 установлен" ; else pamac install --no-confirm $1 ; fi
+}
+
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
-  package="pacman-contrib"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "pacman-contrib установлен" ; else pamac install --no-confirm pacman-contrib ; fi
-  package="rebuild-detector"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "rebuild-detector установлен" ; else pamac install --no-confirm rebuild-detector ; fi
-  package="clamav"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "clamav установлен" ; else pamac install --no-confirm clamav ; fi
-  package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "timeshift установлен" ; else pamac install --no-confirm timeshift ; fi
-  package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "timeshift-autosnap-manjaro установлен" ; else pamac install --no-confirm timeshift-autosnap-manjaro ; fi
-  package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "yay установлен" ; else pamac install --no-confirm yay ; fi
-  package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "meld установлен" ; else pamac install --no-confirm meld ; fi
-  package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "needrestart установлен" ; else pamac install --no-confirm needrestart ; fi
-  package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then echo -e "rkhunter установлен" ; else pamac install --no-confirm rkhunter ; fi 
-  #package="paru-bin"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  #if [ -n "${check}" ] ; then echo -e "paru-bin установлен" ; else pamac build --no-confirm paru-bin ; fi 
+  pack pacman-contrib ; pack rebuild-detector ; pack clamav ; pack timeshift ; pack timeshift-autosnap-manjaro 
+  pack yay ; pack meld ; pack needrestart ; pack rkhunter ; 
+  #pack paru-bin ;  
     if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     mkdir -p $HOME/my_scripts
     touch $HOME/my_scripts/rkhunter.sh
