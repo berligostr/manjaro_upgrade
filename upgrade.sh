@@ -82,7 +82,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов репозиториев, сборка AUR не обновляется!"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --no-confirm --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-  echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
@@ -175,7 +175,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
           sudo rkhunter --propupd 2> /dev/null
           $HOME/my_scripts/rkhunter.sh ; 
-          echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+          echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
         fi
     fi
@@ -197,7 +197,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi  
-  echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
@@ -267,7 +267,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
           sudo rkhunter --propupd 2> /dev/null
           $HOME/my_scripts/rkhunter.sh ; 
-          echo -e "\n"; echo "Нажмите любую клавишу, чтобы продолжить"
+          echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
         fi
     fi
