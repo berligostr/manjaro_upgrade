@@ -102,8 +102,8 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu --repo | tee $HOME/upgrade.paru; fi
         # if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
       fi
-    echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqta;
-    if [[ "$uqta" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
+      echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqta;
+      if [[ "$uqta" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
   #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --no-aur ; fi
   # echo -e "\n";
@@ -211,6 +211,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyu --aur | tee $HOME/upgrade.paru; fi
       fi
+      echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqta;
+      if [[ "$uqta" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
   #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
