@@ -152,6 +152,14 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
       fi
     fi
+    echo -e "\n"; read -n 1 -p "Сделать загружаемым по умолчанию новое ядро? [y/N]: " lynn; 
+    if [[ "$lynn" = [yYlLдД] ]]; then
+      echo -e "\n"; echo "В системе установлены следующие ядра:"
+      pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
+      lini=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }')
+      echo -e "\n"; echo "По умолчанию rEFInd будет загружать $lini "
+      /home/kostya/my_scripts/refind-hook.sh
+    fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
       if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
