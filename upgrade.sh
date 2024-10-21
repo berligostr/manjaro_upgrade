@@ -181,13 +181,13 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; 
       then
-        echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh;
+        echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
         if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
-          sudo rkhunter --propupd 2> /dev/null
           $HOME/my_scripts/rkhunter.sh ; 
           echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-        fi
+        echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
+        if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
     fi
   fi
 fi
@@ -275,13 +275,13 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; 
       then
-        echo -e "\n"; read -n 1 -p "Создать базу данных для rkhunter и выполнить проверку? [y/N]: " rkh; 
+        echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
         if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
-          sudo rkhunter --propupd 2> /dev/null
           $HOME/my_scripts/rkhunter.sh ; 
           echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-        fi
+        echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
+        if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
     fi
   fi
 fi
