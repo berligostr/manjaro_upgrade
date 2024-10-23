@@ -298,4 +298,3 @@ echo -e "\n";
 if [[ -f $HOME/upgrade.paru ]]; then rm $HOME/upgrade.paru; fi
 if [[ -f $HOME/upgrade.yay ]]; then rm $HOME/upgrade.yay; fi
 if [[ -f $HOME/upgrade.pamac ]]; then rm $HOME/upgrade.pamac; fi
-
