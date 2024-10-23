@@ -186,8 +186,9 @@ if [[ "$updrep" = [yYlLдД] ]]; then
           $HOME/my_scripts/rkhunter.sh ; 
           echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-        echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
-        if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
+          echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
+          if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
+        fi
     fi
   fi
 fi
@@ -280,8 +281,9 @@ if [[ "$updaur" = [yYlLдД] ]]; then
           $HOME/my_scripts/rkhunter.sh ; 
           echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-        echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
-        if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
+          echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
+          if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
+        fi
     fi
   fi
 fi
@@ -297,4 +299,4 @@ echo -e "\n";
 # Удаление логов ------------------------------------------------------------------------------
 if [[ -f $HOME/upgrade.paru ]]; then rm $HOME/upgrade.paru; fi
 if [[ -f $HOME/upgrade.yay ]]; then rm $HOME/upgrade.yay; fi
-if [[ -f $HOME/upgrade.pamac ]]; then rm $HOME/upgrade.pamac; fi
+if [[ -f $HOME/upgrade.pamac ]]; then rm $HOME/upgrade.pamac; fi 
