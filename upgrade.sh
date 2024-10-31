@@ -103,6 +103,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         # if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
       fi
       echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqta;
+      # shellcheck disable=SC2046
       if [[ "$uqta" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
   #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --enable-downgrade --no-aur ; fi
@@ -149,7 +150,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
       package="thunar"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
       if [ -n "${check}" ] ; 
         then
-        cd /usr/lib/modules/; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
+        cd /usr/lib/modules/ || exit; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
       fi
     fi
     echo -e "\n"; read -n 1 -p "Сделать загружаемым по умолчанию новое ядро? [y/N]: " lynn; 
@@ -221,6 +222,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
         if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyu --aur | tee $HOME/upgrade.paru; fi
       fi
       echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqta;
+      # shellcheck disable=SC2046
       if [[ "$uqta" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
   #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
@@ -276,8 +278,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; 
       then
-        echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
-        if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
+        echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh1; 
+        if [[ "$rkh1" = [yYlLдД] ]]; then echo -e "\n";
           $HOME/my_scripts/rkhunter.sh ; 
           echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
           while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
