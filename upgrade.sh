@@ -1,6 +1,6 @@
 #!/bin/bash
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
-echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib"
+echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib, libnotify"
 echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar."
 echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
@@ -11,10 +11,23 @@ pack ()
   if [ -n "${check}" ] ; then echo -e "$1 установлен" ; else pamac install --no-confirm $1 ; fi
 }
 
+enter ()
+{
+  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
+  package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  if [ -n "${check}" ] ; then
+    while true; do read -t 1 variable <&1 ; 
+     if [ $? = 0 ] ; then break ; else 
+       notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+     fi ;  
+    done
+  fi
+}
+
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
-  pack yay ; pack meld ; pack needrestart ; pack thunar ;
+  pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ;
   #pack paru-bin ;  
     #if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     #mkdir -p $HOME/my_scripts
@@ -82,15 +95,13 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов репозиториев, сборка AUR не обновляется!"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --no-confirm --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
+  enter libnotify
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi  
   # ---------------------------------------------------------------------------------------------
-  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
+  enter libnotify
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
@@ -159,7 +170,10 @@ if [[ "$updrep" = [yYlLдД] ]]; then
       pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
       lini=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }')
       echo -e "\n"; read -n 1 -p "По умолчанию rEFInd будет загружать $lini ? [y/N]: " lynin;
-      if [[ "$lynin" = [yYlLдД] ]]; then /home/kostya/my_scripts/refind-hook.sh ; fi
+      if [[ "$lynin" = [yYlLдД] ]]; then 
+        lin=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }' | awk -F. '{ print "/boot/vmlinuz-"$1"."$2"-x86_64" }')
+        if [ -e $lin ]; then sudo touch -m $lin; fi
+      fi
     fi
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
@@ -203,14 +217,12 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --aur --no-confirm && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
-  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
+  enter libnotify
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi  
-  echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-  while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
+  enter libnotify
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
