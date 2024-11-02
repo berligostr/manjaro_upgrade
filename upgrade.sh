@@ -147,9 +147,6 @@ if [ -n "${check}" ] ; then
     else echo -e "\n"; echo -e "Сейчас невозможно определить последний бэкап, так как работает timeshift"
   fi  
 fi
-# echo -e "\n"; read -n 1 -p "Обновить установленные пакеты? [Y/n]: " update; 
-# if [[ "$update" = "" || "$update" = [yYlLдД] ]]; then 
-# pamac upgrade --forse-refresh; 
 # Если терминал завис нужно нажать Ctrl+c
 echo -e "\n"; read -n 1 -p "Обновить пакеты из репозиториев? [y/N]: " updrep;
 if [[ "$updrep" = [yYlLдД] ]]; then
