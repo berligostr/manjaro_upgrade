@@ -87,9 +87,25 @@ syrot ()
 
 reqt ()
 {
-      echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
-      # shellcheck disable=SC2046
-      if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
+  # Функция пересборки пакетов Qt
+  echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
+  # shellcheck disable=SC2046
+  if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
+}
+
+updatep ()
+{
+  # Функция обновления пакетов чере pamac $1 = репозиториев, сборка AUR не обновляется $2 = --no-aur $3 = --enable-downgrade
+  #                                       $1 = AUR                                     $2 = --aur    $3 = ''
+    echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
+    echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
+    ( pamac upgrade --no-confirm $3 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+    enter libnotify
+    echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
+    if [[ "$update" = [yYlLдД] ]]; then 
+      ( pamac upgrade --force-refresh $3 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
+    fi
+    enter libnotify 
 }
 
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
@@ -157,16 +173,7 @@ fi
 # Если терминал завис нужно нажать Ctrl+c
 echo -e "\n"; read -n 1 -p "Обновить пакеты из репозиториев? [y/N]: " updrep;
 if [[ "$updrep" = [yYlLдД] ]]; then
-  echo -e "\n"; echo -e "Будет произведено обновление пакетов репозиториев, сборка AUR не обновляется!"; 
-  echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --no-confirm --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-  enter libnotify
-  echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
-  if [[ "$update" = [yYlLдД] ]]; then 
-    ( pamac upgrade --force-refresh --enable-downgrade --no-aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
-  fi  
-  # ---------------------------------------------------------------------------------------------
-  enter libnotify
+  updatep "репозиториев, сборка AUR не обновляется" --no-aur --enable-downgrade
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
@@ -245,15 +252,7 @@ fi
 if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/db.lck; fi
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
-  echo -e "\n"; echo -e "Будет произведено обновление пакетов из AUR."; 
-  echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --aur --no-confirm && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
-  enter libnotify
-  echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
-  if [[ "$update" = [yYlLдД] ]]; then 
-    ( pamac upgrade --force-refresh --aur && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
-  fi  
-  enter libnotify
+  updatep AUR --aur
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
