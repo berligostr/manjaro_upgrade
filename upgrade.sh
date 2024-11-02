@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib"
-echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart."
+echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar."
 echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
 
@@ -14,7 +14,7 @@ pack ()
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
-  pack yay ; pack meld ; pack needrestart ; 
+  pack yay ; pack meld ; pack needrestart ; pack thunar ;
   #pack paru-bin ;  
     #if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     #mkdir -p $HOME/my_scripts
