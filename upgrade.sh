@@ -24,6 +24,67 @@ enter ()
   fi
 }
 
+pacdiffmeld ()
+{
+  #Функция Сравнить конфиги pacnew
+    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
+    if [[ "$diff" = [yYlLдД] ]]; then 
+      package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+      if [ -n "${check}" ] ; 
+        then
+          echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
+          if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
+            then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
+            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
+          fi
+        else
+          echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
+      fi
+    fi
+    #Конец условия Сравнить конфиги pacnew?
+}
+
+needrest ()
+{ 
+  # Функция проверки сервисов для перезапуска
+  package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  if [ -n "${check}" ] ; 
+    then
+      echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
+      if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; then
+        echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
+      fi
+  fi
+  # Конец Функции проверки сервисов для перезапуска
+}
+
+checkrebu ()
+{
+  # Функция проверки пакетов для пересборки
+    echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
+    if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
+      if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
+        then echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; checkrebuild | grep -v zoom ;
+        else echo "Пакетов из AUR для пересборки нет."; 
+      fi
+    fi  
+}
+
+syrot ()
+{ 
+  # Функция проверки и очистки пакетов-сирот
+    echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syro;  
+    if [[ "$syro" = [yYlLдД] ]]; then echo -e "\n"; 
+      if [ -n "$(pamac list -o | head -n 1)" ];
+        then echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
+          pamac list -o
+          echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
+          if [[ "$syrd" = [yYlLдД] ]]; then echo -e "\n"; pamac remove -o ; fi
+        else echo "Пакеты сироты отсутствуют."; 
+      fi
+    fi  
+}
+
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
@@ -130,29 +191,11 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [Y/n]: " diff;
-    if [[ "$diff" = "" || "$diff" = [yYlLдД] ]]; then 
-      package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-      if [ -n "${check}" ] ; 
-        then
-          echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
-          if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
-            then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
-            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
-          fi
-        else
-          echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
-      fi
-    fi
-    # Конец условия Сравнить конфиги pacnew? 
-    package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    if [ -n "${check}" ] ; 
-      then
-        echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
-        if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; then
-          echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
-        fi
-    fi
+    # Сравнение конфигов pacnew
+    pacdiffmeld
+    # Рестарт сервисов 
+    needrest
+    # Конец проверки сервисов для рестарта
     echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
     if [[ "$kerny" = [yYlLдД] ]]; then
       echo -e "\n"; echo "В системе установлены следующие ядра:"
@@ -175,23 +218,10 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         if [ -e $lin ]; then sudo touch -m $lin; fi
       fi
     fi
-    echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
-    if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
-      if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
-        then echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; checkrebuild | grep -v zoom ;
-        else echo "Пакетов из AUR для пересборки нет."; 
-      fi
-    fi
-    echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syr;  
-    if [[ "$syr" = [yYlLдД] ]]; then echo -e "\n"; 
-      if [[ -n "$(pamac list -o | head -n 1)" ]];
-        then echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
-          pamac list -o
-          echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
-          if [[ "$syrd" = [yYlLдД] ]]; then echo -e "\n"; pamac remove -o ; fi
-        else echo -e "\n"; echo "Пакеты сироты отсутствуют."; echo -e "\n";
-      fi
-    fi
+    # Пересборка необходимых пакетов
+    checkrebu
+    # Поиск и уаление сирот
+    syrot
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
     #package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     #if [ -n "${check}" ] ; 
@@ -245,47 +275,14 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
-    if [[ "$diff" = [yYlLдД] ]]; then 
-      package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-      if [ -n "${check}" ] ; 
-        then
-          echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
-          if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
-            then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
-            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
-          fi
-        else
-          echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
-      fi
-    fi
-    # Конец условия Сравнить конфиги pacnew? 
-    package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    if [ -n "${check}" ] ; 
-      then
-        echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [y/N]: " restart;
-        if [[ "$restart" = [yYlLдД] ]]; then
-          echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
-        fi
-    fi
-    echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
-    if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
-      if [ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]; 
-        then echo "Возможно необходимо пересобрать следующие пакеты из AUR:"; echo -e "\n"; 
-          checkrebuild | grep -v zoom
-        else echo "Пакетов из AUR для пересборки нет."; echo -e "\n";
-      fi
-    fi
-    echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syro;  
-    if [[ "$syro" = [yYlLдД] ]]; then echo -e "\n"; 
-      if [ -n "$(pamac list -o | head -n 1)" ];
-        then echo "Возможно следующие пакеты являются сиротами (ПРОВЕРЬТЕ перед удалением!): "; echo -e "\n"; 
-          pamac list -o
-          echo -e "\n"; read -n 1 -p "Удалить пакеты сироты? [y/N]: " syrd; 
-          if [[ "$syrd" = [yYlLдД] ]]; then echo -e "\n"; pamac remove -o ; fi
-        else echo "Пакеты сироты отсутствуют."; 
-      fi
-    fi
+    # Сравнение конфигов pacnew
+    pacdiffmeld
+    # Рестарт сервисов 
+    needrest
+    # Проверка наличия пакетов для пересборки
+    checkrebu
+    # Проверка и удаление пакетов сирот
+    syrot
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
     #package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     #if [ -n "${check}" ] ; 
