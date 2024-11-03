@@ -4,18 +4,22 @@ echo -e "Для полноценной работы скрипта необхо�
 echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar."
 echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
-
+# ----------------------------------------------------------------------------------------------------
+# Описание используемых функций в скрипте
 pack () 
 {
+  # Функция проверки наличия и установки пакета
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
   if [ -n "${check}" ] ; then echo -e "$1 установлен" ; else pamac install --no-confirm $1 ; fi
 }
 
 enter ()
 {
+  # Функция ожидания нажатия клавиши $1 = libnotify
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
+    # shellcheck disable=SC2034
     while true; do read -t 1 variable <&1 ; 
      if [ $? = 0 ] ; then break ; else 
        notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
@@ -147,45 +151,24 @@ rkhunt ()
   fi
 }
 
-
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
   pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ;
   #pack paru-bin ;  
-
-#  if [ ! -f $HOME/my_scripts/update_clamav.sh ]; then
-#    mkdir -p $HOME/my_scripts
-#    touch $HOME/my_scripts/update_clamav.sh
-#    echo "#!/bin/bash " >> $HOME/my_scripts/update_clamav.sh
-#    echo "systemctl stop clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
-#    echo "if [ -f /var/lib/clamav/freshclam.dat ]; then rm -f /var/lib/clamav/freshclam.dat; fi " >> $HOME/my_scripts/update_clamav.sh
-#    echo "if [ -f /var/lib/clamav/main.cvd ]; then rm -f /var/lib/clamav/*.cvd; fi " >> $HOME/my_scripts/update_clamav.sh
-#    echo "wget https://packages.microsoft.com/clamav/main.cvd -O /var/lib/clamav/main.cvd " >> $HOME/my_scripts/update_clamav.sh
-#    echo "wget https://packages.microsoft.com/clamav/daily.cvd -O /var/lib/clamav/daily.cvd " >> $HOME/my_scripts/update_clamav.sh
-#    echo "wget https://packages.microsoft.com/clamav/bytecode.cvd -O /var/lib/clamav/bytecode.cvd " >> $HOME/my_scripts/update_clamav.sh
-#    echo "stat /var/lib/clamav/daily.cvd | grep Модифицирован " >> $HOME/my_scripts/update_clamav.sh
-#    echo "systemctl start clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
-#    echo "systemctl restart clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
-#    chmod +x $HOME/my_scripts/update_clamav.sh
-#  fi
+  #
+  # Здесь будет возможность подключения и обновления антивируса
+  # Запуск гуя timeshift для настройки
   timeshift-launcher
 fi
-#package="clamav"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-#if [ -n "${check}" ] ; 
-#  then
-#    if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -e "\n"; 
-#      echo -e "База clamav создана более недели назад!"; echo -e "\n"; stat /var/lib/clamav/daily.cvd | grep Модифицирован ; 
-#      echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
-#      if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo $HOME/my_scripts/update_clamav.sh; fi
-#    fi
-#fi
+# Необходимые пакеты установлены и настроены
 # ---------------------------------------------------------------------------------------------
 # Удаление блокировки баз при ее наличии
 if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
 echo -e "\n"; echo -e "Проверка наличия обновлений:"; echo -e "\n"; pamac checkupdates -a
 # ---------------------------------------------------------------------------------------------
+# Проверка состояни бэкапа timeshift
 package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; then
   if ! pgrep 'timeshift'>null; 
@@ -233,15 +216,19 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         cd /usr/lib/modules/ || exit; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
       fi
     fi
-    echo -e "\n"; read -n 1 -p "Сделать загружаемым по умолчанию новое ядро? [y/N]: " lynn; 
-    if [[ "$lynn" = [yYlLдД] ]]; then
-      echo -e "\n"; echo "В системе установлены следующие ядра:"
-      pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
-      lini=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }')
-      echo -e "\n"; read -n 1 -p "По умолчанию rEFInd будет загружать $lini ? [y/N]: " lynin;
-      if [[ "$lynin" = [yYlLдД] ]]; then 
-        lin=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }' | awk -F. '{ print "/boot/vmlinuz-"$1"."$2"-x86_64" }')
-        if [ -e $lin ]; then sudo touch -m $lin; fi
+    # Устранение недоразуменя загрузки старого ядра через rEFInd
+    package="refind"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+    if [ -n "${check}" ] ; then
+      echo -e "\n"; read -n 1 -p "Сделать загружаемым по умолчанию новое ядро? [y/N]: " lynn; 
+      if [[ "$lynn" = [yYlLдД] ]]; then
+        echo -e "\n"; echo "В системе установлены следующие ядра:"
+        pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
+        lini=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }')
+        echo -e "\n"; read -n 1 -p "По умолчанию rEFInd будет загружать $lini ? [y/N]: " lynin;
+        if [[ "$lynin" = [yYlLдД] ]]; then 
+          lin=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }' | awk -F. '{ print "/boot/vmlinuz-"$1"."$2"-x86_64" }')
+          if [ -e $lin ]; then sudo touch -m $lin; fi
+        fi
       fi
     fi
     # Пересборка необходимых пакетов
@@ -259,7 +246,6 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   updatep AUR --aur --aur
-  #if [[ ! "$update" = [yYlLдД] ]]; then pamac upgrade --force-refresh --aur ; fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
@@ -291,4 +277,35 @@ echo -e "\n";
 if [[ -f $HOME/upgrade.paru ]]; then rm $HOME/upgrade.paru; fi
 if [[ -f $HOME/upgrade.yay ]]; then rm $HOME/upgrade.yay; fi
 if [[ -f $HOME/upgrade.pamac ]]; then rm $HOME/upgrade.pamac; fi 
-
+# В разработке
+# ---------------------------------------------------------------------------------------------
+# Создание скрипта обновления антивирусных баз
+#  if [ ! -f $HOME/my_scripts/update_clamav.sh ]; then
+#    mkdir -p $HOME/my_scripts
+#    touch $HOME/my_scripts/update_clamav.sh
+#    echo "#!/bin/bash " >> $HOME/my_scripts/update_clamav.sh
+#    echo "systemctl stop clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
+#    echo "if [ -f /var/lib/clamav/freshclam.dat ]; then rm -f /var/lib/clamav/freshclam.dat; fi " >> $HOME/my_scripts/update_clamav.sh
+#    echo "if [ -f /var/lib/clamav/main.cvd ]; then rm -f /var/lib/clamav/*.cvd; fi " >> $HOME/my_scripts/update_clamav.sh
+#    echo "wget https://packages.microsoft.com/clamav/main.cvd -O /var/lib/clamav/main.cvd " >> $HOME/my_scripts/update_clamav.sh
+#    echo "wget https://packages.microsoft.com/clamav/daily.cvd -O /var/lib/clamav/daily.cvd " >> $HOME/my_scripts/update_clamav.sh
+#    echo "wget https://packages.microsoft.com/clamav/bytecode.cvd -O /var/lib/clamav/bytecode.cvd " >> $HOME/my_scripts/update_clamav.sh
+#    echo "stat /var/lib/clamav/daily.cvd | grep Модифицирован " >> $HOME/my_scripts/update_clamav.sh
+#    echo "systemctl start clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
+#    echo "systemctl restart clamav-freshclam " >> $HOME/my_scripts/update_clamav.sh
+#    chmod +x $HOME/my_scripts/update_clamav.sh
+#  fi
+# Скрипт обновления антивируса создан
+# ----------------------------------------------------------------------------------------------
+# Обновление баз антивируса
+#package="clamav"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+#if [ -n "${check}" ] ; 
+#  then
+#    if [[ ! -z "$(find /var/lib/clamav/daily.cvd -type f -mtime +6)" ]]; then echo -e "\n"; 
+#      echo -e "База clamav создана более недели назад!"; echo -e "\n"; stat /var/lib/clamav/daily.cvd | grep Модифицирован ; 
+#      echo -e "\n"; read -n 1 -p "Обновить базы антивируса clamav? [y/N]: " clupdate;
+#      if [[ "$clupdate" = [yYlLдД] ]]; then echo -e "\n"; sudo $HOME/my_scripts/update_clamav.sh; fi
+#    fi
+#fi
+# Базы антивируса обновлены
+# -----------------------------------------------------------------------------------------------
