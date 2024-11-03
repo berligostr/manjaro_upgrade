@@ -116,22 +116,44 @@ updatep ()
       if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu $4 | tee $HOME/upgrade.paru; fi
     fi
     # Проверка необходимости пересборки Qt пакетов
-    reqt
+    # Функция пересборки пакетов Qt
+    echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
+    # shellcheck disable=SC2046
+    if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
 }
+
+rkhunt ()
+{
+  # Создание исполняемого файла для запуска rkhunter
+  if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
+    mkdir -p $HOME/my_scripts
+    touch $HOME/my_scripts/rkhunter.sh
+    echo "#!/bin/bash " >> $HOME/my_scripts/rkhunter.sh
+    echo "sudo rkhunter --check --skip-keypress --update --report-warnings-only 2> /dev/null " >> $HOME/my_scripts/rkhunter.sh
+    chmod +x $HOME/my_scripts/rkhunter.sh
+  fi
+  # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
+  package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  if [ -n "${check}" ] ; 
+    then
+      echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
+      if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
+        $HOME/my_scripts/rkhunter.sh ; 
+        enter libnotify
+        echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
+        if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
+      fi
+  fi
+}
+
 
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
   pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ;
   #pack paru-bin ;  
-    #if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
-    #mkdir -p $HOME/my_scripts
-    #touch $HOME/my_scripts/rkhunter.sh
-    #echo "#!/bin/bash " >> $HOME/my_scripts/rkhunter.sh
-    #echo "sudo rkhunter --check --skip-keypress --update --report-warnings-only 2> /dev/null " >> $HOME/my_scripts/rkhunter.sh
-    #chmod +x $HOME/my_scripts/rkhunter.sh
-    #fi
+
 #  if [ ! -f $HOME/my_scripts/update_clamav.sh ]; then
 #    mkdir -p $HOME/my_scripts
 #    touch $HOME/my_scripts/update_clamav.sh
@@ -162,8 +184,6 @@ fi
 # Удаление блокировки баз при ее наличии
 if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/db.lck; fi
 # Этот скрипт проверяет наличие обновлений, обновляет и перезапускает сервисы при необходимости
-#echo -e "\n"; read -n 1 -p "Проверить обновления? [y/N]: " cupdate; 
-#if [[ "$cupdate" = [yYlLдД] ]]; then echo -e "\n"; pamac checkupdates -a; fi
 echo -e "\n"; echo -e "Проверка наличия обновлений:"; echo -e "\n"; pamac checkupdates -a
 # ---------------------------------------------------------------------------------------------
 package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -228,19 +248,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     checkrebu
     # Поиск и уаление сирот
     syrot
-    # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-    #package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    #if [ -n "${check}" ] ; 
-    #  then
-    #    echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
-    #    if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
-    #      $HOME/my_scripts/rkhunter.sh ; 
-    #      echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-    #      while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-    #      echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
-    #      if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
-    #    fi
-    #fi
+    #rkhunt
   fi
 fi
 # Конец условия Необходимости постобработки после обновления пакетов репозиториев ----------------------------------------------
@@ -268,21 +276,9 @@ if [[ "$updaur" = [yYlLдД] ]]; then
     # Проверка и удаление пакетов сирот
     syrot
     # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-    #package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    #if [ -n "${check}" ] ; 
-    #  then
-    #    echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh1; 
-    #    if [[ "$rkh1" = [yYlLдД] ]]; then echo -e "\n";
-    #      $HOME/my_scripts/rkhunter.sh ; 
-    #      echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-    #      while true; do read -t 1 variable <&1 ; if [ $? = 0 ] ; then break ; else notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; fi ;  done
-    #      echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
-    #      if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
-    #    fi
-    #fi
+    #rkhunt
   fi
 fi
-#if [[ ! "$update" = [yYlLдД] ]]; then echo -e "\n"; pamac upgrade --force-refresh --enable-downgrade --aur ; fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
 package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
