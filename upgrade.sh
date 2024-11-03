@@ -150,7 +150,8 @@ rkhunt ()
       fi
   fi
 }
-
+# Конец описания функций скрипта
+# ----------------------------------------------------------------------------------------
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
@@ -238,7 +239,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     #rkhunt
   fi
 fi
-# Конец условия Необходимости постобработки после обновления пакетов репозиториев ----------------------------------------------
+# Конец условия Необходимости постобработки после обновления пакетов репозиториев --------------------------------
 #  else echo -e "\n"; echo -e "Вы приняли решение не обновлять установленные пакеты"
 #fi
 # Удаление блокировки баз при ее наличии
@@ -252,6 +253,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
+  # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     # Сравнение конфигов pacnew
     pacdiffmeld
