@@ -103,11 +103,11 @@ updatep ()
   #                                       $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --no-confirm $3 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+  ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
   enter libnotify
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
-    ( pamac upgrade --force-refresh $3 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
+    ( pamac upgrade --force-refresh $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi
   enter libnotify
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -115,9 +115,9 @@ updatep ()
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; then
       echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
-      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyuu $4 | tee $HOME/upgrade.yay; fi
+      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyuu $3 | tee $HOME/upgrade.yay; fi
       echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
-      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu $4 | tee $HOME/upgrade.paru; fi
+      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu $3 | tee $HOME/upgrade.paru; fi
     fi
     # Проверка необходимости пересборки Qt пакетов
     # Функция пересборки пакетов Qt
