@@ -18,11 +18,14 @@ enter ()
   # Функция ожидания нажатия клавиши $1 = libnotify
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then
-    # shellcheck disable=SC2034
-    while true; do read -t 1 variable <&1 ; 
-     if [ $? = 0 ] ; then break ; else 
-       notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+  if [ -n "${check}" ] ; then 
+     package="libcanberra"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+     if [ -n "${check}" ] ; then
+       # shellcheck disable=SC2034
+       while true; do read -t 1 variable <&1 ; 
+       if [ $? = 0 ] ; then break ; else 
+         notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+       fi ; 
      fi ;  
     done
   fi
@@ -155,7 +158,7 @@ rkhunt ()
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
-  pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ;
+  pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ; pack libcanberra ;
   #pack paru-bin ;  
   #
   # Здесь будет возможность подключения и обновления антивируса
