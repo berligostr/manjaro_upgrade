@@ -23,11 +23,11 @@ enter ()
      if [ -n "${check}" ] ; then
        # shellcheck disable=SC2034
        while true; do read -t 1 variable <&1 ; 
-       if [ $? = 0 ] ; then break ; else 
-         notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
-       fi ; 
-     fi ;  
-    done
+         if [ $? = 0 ] ; then break ; else 
+           notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+         fi ; 
+       done
+     fi ; 
   fi
 }
 
