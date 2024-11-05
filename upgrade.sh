@@ -15,19 +15,22 @@ pack ()
 
 enter ()
 {
-  # Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra
+  # Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra $3 = sound-theme-freedesktop
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then 
-     package="$2"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-     if [ -n "${check}" ] ; then
-       # shellcheck disable=SC2034
-       while true; do read -t 1 variable <&1 ; 
-         if [ $? = 0 ] ; then break ; else 
-           notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
-         fi ; 
-       done
-     fi ; 
+    package="$2"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+    if [ -n "${check}" ] ; then
+      package="$3"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";   
+      if [ -n "${check}" ] ; then
+        # shellcheck disable=SC2034
+        while true; do read -t 1 variable <&1 ; 
+          if [ $? = 0 ] ; then break ; else 
+            notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+          fi ; 
+        done
+      fi ;
+    fi ; 
   fi
 }
 
@@ -107,12 +110,12 @@ updatep ()
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-  enter libnotify libcanberra
+  enter libnotify libcanberra sound-theme-freedesktop
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi
-  enter libnotify libcanberra
+  enter libnotify libcanberra sound-theme-freedesktop
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
@@ -147,7 +150,7 @@ rkhunt ()
       echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
       if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
         $HOME/my_scripts/rkhunter.sh ; 
-        enter libnotify libcanberra
+        enter libnotify libcanberra sound-theme-freedesktop
         echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
         if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
       fi
@@ -157,8 +160,9 @@ rkhunt ()
 # ----------------------------------------------------------------------------------------
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
-  pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro 
+  pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro ;
   pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ; pack libcanberra ;
+  pack sound-theme-freedesktop ;
   #pack paru-bin ;  
   #
   # Здесь будет возможность подключения и обновления антивируса
