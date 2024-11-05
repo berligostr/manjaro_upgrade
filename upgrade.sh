@@ -15,11 +15,11 @@ pack ()
 
 enter ()
 {
-  # Функция ожидания нажатия клавиши $1 = libnotify
+  # Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then 
-     package="libcanberra"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+     package="$2"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
      if [ -n "${check}" ] ; then
        # shellcheck disable=SC2034
        while true; do read -t 1 variable <&1 ; 
@@ -107,12 +107,12 @@ updatep ()
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
-  enter libnotify
+  enter libnotify libcanberra
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( pamac upgrade --force-refresh $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
   fi
-  enter libnotify
+  enter libnotify libcanberra
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
@@ -147,7 +147,7 @@ rkhunt ()
       echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
       if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
         $HOME/my_scripts/rkhunter.sh ; 
-        enter libnotify
+        enter libnotify libcanberra
         echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
         if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
       fi
