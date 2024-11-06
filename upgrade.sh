@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.9.14
+# Версия скрипта 1.10.16
 # Скрипт линейный = 1, количество функций = 9, версия сборки = 14
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -160,6 +160,16 @@ rkhunt ()
       fi
   fi
 }
+postrun ()
+{
+  # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
+  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
+  # --------------------------------------------------------------------------------------------
+}
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
@@ -204,19 +214,8 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # ---------------------------------------------------------------------------------------------
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
   # if [[ "$flat" = [yY] ]]; then echo -e "\n"; flatpak update; echo -e "\n"; fi
-  # Проверка необходимости постдействий после обновлений ---------------------------------------
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
-  # --------------------------------------------------------------------------------------------
+  postrun
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    # Сравнение конфигов pacnew
-    pacdiffmeld
-    # Рестарт сервисов 
-    needrest
-    # Конец проверки сервисов для рестарта
     echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
     if [[ "$kerny" = [yYlLдД] ]]; then
       echo -e "\n"; echo "В системе установлены следующие ядра:"
@@ -243,6 +242,10 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         fi
       fi
     fi
+    # Сравнение конфигов pacnew
+    pacdiffmeld
+    # Рестарт сервисов 
+    needrest
     # Пересборка необходимых пакетов
     checkrebu
     # Поиск и уаление сирот
@@ -258,11 +261,7 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   updatep AUR --aur --aur
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
+  postrun
   # --------------------------------------------------------------------------------------------
   # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
