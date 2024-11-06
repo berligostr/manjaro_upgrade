@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.10.18
+# Версия скрипта 1.10.19
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -162,11 +162,12 @@ rkhunt ()
   fi
 }
 
-postrun ()
+postrun () 
 {
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Нет заданий.'; then rm $HOME/upgrade.pamac; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep 'Ничего не нужно делать'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
+  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep 'делать больше нечего'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'Нет заданий'; then rm $HOME/upgrade.paru; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep 'there is nothing to do'; then rm $HOME/upgrade.paru; fi; fi
