@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.10.19
+# Версия скрипта 1.10.20
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -103,9 +103,12 @@ syrot ()
 reqt ()
 {
   # 7 Функция пересборки пакетов Qt
-  echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
-  # shellcheck disable=SC2046
-  if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
+  package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  if [ -n "${check}" ] ; then
+    echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
+    # shellcheck disable=SC2046
+    if [[ "$uqtaq" = [yYlLдД] ]]; then echo -e "\n"; ( yay -S --rebuild $(pacman -Qmt | grep ^qt) ) |& tee -i $HOME/upgrade.yay ; fi
+  fi
 }
 
 updatep ()
@@ -132,9 +135,9 @@ updatep ()
     fi
     # Проверка необходимости пересборки Qt пакетов
     # Функция пересборки пакетов Qt
-    echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
-    # shellcheck disable=SC2046
-    if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
+    #echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
+    ## shellcheck disable=SC2046
+    #if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
   fi
 }
 
@@ -245,6 +248,8 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         fi
       fi
     fi
+    # Пересборка пакетов Qt
+    reqt
     # Сравнение конфигов pacnew
     pacdiffmeld
     # Рестарт сервисов 
@@ -268,6 +273,8 @@ if [[ "$updaur" = [yYlLдД] ]]; then
   # --------------------------------------------------------------------------------------------
   # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
+    # Пересборка пакетов Qt
+    reqt
     # Сравнение конфигов pacnew
     pacdiffmeld
     # Рестарт сервисов 
