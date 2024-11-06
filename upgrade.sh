@@ -1,21 +1,25 @@
 #!/bin/bash
+# Версия скрипта 1.9.14
+# Скрипт линейный = 1, количество функций = 9, версия сборки = 14
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
-echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib, libnotify"
-echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar."
-echo -e "аурхелпер paru вы должны установить самостоятельно, при наличии yay он не нужен."
+echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
+echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib, "
+echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar, "
+echo -e " libnotify, libcanberra, sound-theme-freedesktop. "
+echo -e "Аурхелпер paru вы должны установить самостоятельно, но при наличии yay он не нужен. "
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
 # ----------------------------------------------------------------------------------------------------
 # Описание используемых функций в скрипте
 pack () 
 {
-  # Функция проверки наличия и установки пакета
+  # 1 Функция проверки наличия и установки пакета
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
   if [ -n "${check}" ] ; then echo -e "$1 установлен" ; else pamac install --no-confirm $1 ; fi
 }
 
 enter ()
 {
-  # Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra $3 = sound-theme-freedesktop
+  # 2 Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra $3 = sound-theme-freedesktop
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
   package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then 
@@ -36,7 +40,7 @@ enter ()
 
 pacdiffmeld ()
 {
-  #Функция Сравнить конфиги pacnew
+  # 3 Функция Сравнить конфиги pacnew
     echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
     if [[ "$diff" = [yYlLдД] ]]; then 
       package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -56,7 +60,7 @@ pacdiffmeld ()
 
 needrest ()
 { 
-  # Функция проверки сервисов для перезапуска
+  # 4 Функция проверки сервисов для перезапуска
   package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
@@ -70,7 +74,7 @@ needrest ()
 
 checkrebu ()
 {
-  # Функция проверки пакетов для пересборки
+  # 5 Функция проверки пакетов для пересборки
     echo -e "\n"; read -n 1 -p "Проверить, пакеты для пересборки? [y/N]: " pac; 
     if [[ "$pac" = [yYlLдД] ]]; then echo -e "\n";
       if [[ -n "$(checkrebuild | grep -v zoom | head -n 1)" ]]; 
@@ -82,7 +86,7 @@ checkrebu ()
 
 syrot ()
 { 
-  # Функция проверки и очистки пакетов-сирот
+  # 6 Функция проверки и очистки пакетов-сирот
     echo -e "\n"; read -n 1 -p "Проверить пакеты сироты? [y/N]: " syro;  
     if [[ "$syro" = [yYlLдД] ]]; then echo -e "\n"; 
       if [ -n "$(pamac list -o | head -n 1)" ];
@@ -97,7 +101,7 @@ syrot ()
 
 reqt ()
 {
-  # Функция пересборки пакетов Qt
+  # 7 Функция пересборки пакетов Qt
   echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
   # shellcheck disable=SC2046
   if [[ "$uqtaq" = [yYlLдД] ]]; then yay -S --rebuild $(pacman -Qmt | grep ^qt); fi
@@ -105,8 +109,8 @@ reqt ()
 
 updatep ()
 {
-  # Функция обновления пакетов чере pamac $1 = репозиториев $2 = --no-aur $3 = --repo $4 = --enable-downgrade 
-  #                                       $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
+  # 8 Функция обновления пакетов чере pamac $1 = репозиториев $2 = --no-aur $3 = --repo $4 = --enable-downgrade 
+  #                                         $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
@@ -135,7 +139,7 @@ updatep ()
 
 rkhunt ()
 {
-  # Создание исполняемого файла для запуска rkhunter
+  # 9 Функция Создание исполняемого файла для запуска rkhunter
   if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
     mkdir -p $HOME/my_scripts
     touch $HOME/my_scripts/rkhunter.sh
