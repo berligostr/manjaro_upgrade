@@ -1,11 +1,11 @@
 #!/bin/bash
-# Версия скрипта 1.10.17
-# Скрипт линейный = 1, количество функций = 10, версия сборки = 17
+# Версия скрипта 1.10.18
+# Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib, "
 echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar, "
-echo -e " libnotify, libcanberra, sound-theme-freedesktop. "
+echo -e "libnotify, libcanberra, sound-theme-freedesktop. "
 echo -e "Аурхелпер paru вы должны установить самостоятельно, но при наличии yay он не нужен. "
 echo -e "Скрипт будет работать и без них, только с ограниченной функциональностью."
 # ----------------------------------------------------------------------------------------------------
@@ -64,8 +64,9 @@ needrest ()
   package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
-      echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [Y/n]: " restart;
-      if [[ "$restart" = "" || "$restart" = [yYlLдД] ]]; then
+      echo -e "\n"; read -n 1 -p "Проверить сервисы для перезапуска? [y/N]: " restart;
+      # [Y/n] [[ "$restart" = "" || "$restart" = [yYlLдД]  ]]
+      if [[ "$restart" = [yYlLдД] ]]; then
         echo -e "\n"; sudo systemctl daemon-reload; sudo needrestart -u NeedRestart::UI::stdio -r i;  
       fi
   fi
@@ -113,11 +114,11 @@ updatep ()
   #                                         $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac; 
+  ( pamac upgrade --no-confirm $4 $2 && echo "Запись EOF" ) |& tee -i $HOME/upgrade.pamac; 
   enter libnotify libcanberra sound-theme-freedesktop
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
-    ( pamac upgrade --force-refresh $4 $2 && echo "Запись EOF" ) | tee -i $HOME/upgrade.pamac;
+    ( pamac upgrade --force-refresh $4 $2 && echo "Запись EOF" ) |& tee -i $HOME/upgrade.pamac;
   fi
   enter libnotify libcanberra sound-theme-freedesktop
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -125,9 +126,9 @@ updatep ()
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; then
       echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
-      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; yay -Syyuu $3 | tee $HOME/upgrade.yay; fi
+      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; ( yay -Syyuu $3 ) |& tee -i $HOME/upgrade.yay; fi
       echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
-      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; paru -Syyuu $3 | tee $HOME/upgrade.paru; fi
+      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; ( paru -Syyuu $3 ) |& tee -i $HOME/upgrade.paru; fi
     fi
     # Проверка необходимости пересборки Qt пакетов
     # Функция пересборки пакетов Qt
