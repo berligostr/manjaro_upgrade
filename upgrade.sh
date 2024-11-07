@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.10.25
+# Версия скрипта 1.10.26
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -169,6 +169,7 @@ postrun ()
 {
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
   if [[ -f $HOME/upgrade.pamac ]]; then echo -e "\n"; if cat $HOME/upgrade.pamac | grep 'Ничего не нужно делать'; then rm $HOME/upgrade.pamac; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then echo -e "\n"; if cat $HOME/upgrade.pamac | grep 'Nothing to do'; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then echo -e "\n"; if cat $HOME/upgrade.yay | grep 'there is nothing to do'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then echo -e "\n"; if cat $HOME/upgrade.yay | grep 'делать больше нечего'; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then echo -e "\n"; if cat $HOME/upgrade.paru | grep 'делать больше нечего'; then rm $HOME/upgrade.paru; fi; fi
