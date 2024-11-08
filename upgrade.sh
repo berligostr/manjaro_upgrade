@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.10.27
+# Версия скрипта 1.10.28
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -167,7 +167,7 @@ rkhunt ()
 
 postrun () 
 {
-  # postrun 'Ничего не нужно делать' 'Nothing to do' 'there is nothing to do' 'делать больше нечего' 'Нет заданий'
+  # postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   # $1 = 'Ничего не нужно делать' $2 = 'Nothing to do' $3 = 'there is nothing to do' $4= 'делать больше нечего' $5 = 'Нет заданий'
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
   if [[ -f $HOME/upgrade.pamac ]]; then echo -e "\n"; if cat $HOME/upgrade.pamac | grep '$1' ; then rm $HOME/upgrade.pamac; fi; fi
@@ -223,7 +223,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # ---------------------------------------------------------------------------------------------
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
   # if [[ "$flat" = [yY] ]]; then echo -e "\n"; flatpak update; echo -e "\n"; fi
-  postrun 'Ничего не нужно делать' 'Nothing to do' 'there is nothing to do' 'делать больше нечего' 'Нет заданий'
+  postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
     if [[ "$kerny" = [yYlLдД] ]]; then
@@ -272,7 +272,7 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   updatep AUR --aur --aur
-  postrun 'Ничего не нужно делать' 'Nothing to do' 'there is nothing to do' 'делать больше нечего' 'Нет заданий'
+  postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   # --------------------------------------------------------------------------------------------
   # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
