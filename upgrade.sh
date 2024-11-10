@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.10.32
+# Версия скрипта 1.11.33
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -165,7 +165,7 @@ rkhunt ()
   fi
 }
 
-postrun () 
+postrunif () 
 {
   # postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   # $1 = "Ничего не нужно делать" $2 = "Nothing to do" $3 = "there is nothing to do" $4= "делать больше нечего" $5 = "Нет заданий"
@@ -178,6 +178,22 @@ postrun ()
   if [[ -f $HOME/upgrade.paru ]]; then echo -e "\n"; if cat $HOME/upgrade.paru | grep "$5" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if echo -e "\n"; cat $HOME/upgrade.paru | grep "$3" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
   # --------------------------------------------------------------------------------------------
+}
+
+postrun ()
+{
+  # Функция выполнения пост действий после обновления
+    # Пересборка пакетов Qt
+    reqt
+    # Сравнение конфигов pacnew
+    pacdiffmeld
+    # Рестарт сервисов 
+    needrest
+    # Пересборка необходимых пакетов
+    checkrebu
+    # Поиск и уаление сирот
+    syrot
+    #rkhunt
 }
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
@@ -224,7 +240,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
   # if [[ "$flat" = [yY] ]]; then echo -e "\n"; flatpak update; echo -e "\n"; fi
   # Проверка необходимости постдействий обновления из репозиториев ---------------------------
-  postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
+  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
     if [[ "$kerny" = [yYlLдД] ]]; then
@@ -252,17 +268,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         fi
       fi
     fi
-    # Пересборка пакетов Qt
-    reqt
-    # Сравнение конфигов pacnew
-    pacdiffmeld
-    # Рестарт сервисов 
-    needrest
-    # Пересборка необходимых пакетов
-    checkrebu
-    # Поиск и уаление сирот
-    syrot
-    #rkhunt
+    postrun
   fi
 fi
 # Конец условия Необходимости постобработки после обновления пакетов репозиториев --------------------------------
@@ -273,22 +279,11 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   updatep AUR --aur --aur
-  postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
+  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
   # --------------------------------------------------------------------------------------------
   # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    # Пересборка пакетов Qt
-    reqt
-    # Сравнение конфигов pacnew
-    pacdiffmeld
-    # Рестарт сервисов 
-    needrest
-    # Проверка наличия пакетов для пересборки
-    checkrebu
-    # Проверка и удаление пакетов сирот
-    syrot
-    # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-    #rkhunt
+    postrun
   fi
 fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
