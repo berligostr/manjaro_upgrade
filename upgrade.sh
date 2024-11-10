@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.11.33
+# Версия скрипта 1.11.34
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -117,11 +117,11 @@ updatep ()
   #                                         $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 && echo 'Запись EOF'" ) |& tee -i $HOME/upgrade.pamac; 
+  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i $HOME/upgrade.pamac; 
   enter libnotify libcanberra sound-theme-freedesktop
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
-    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 && echo 'Запись EOF' " ) |& tee -i $HOME/upgrade.pamac;
+    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i $HOME/upgrade.pamac;
   fi
   enter libnotify libcanberra sound-theme-freedesktop
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
