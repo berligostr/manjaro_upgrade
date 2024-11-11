@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.11.35
+# Версия скрипта 1.11.36
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -167,11 +167,13 @@ rkhunt ()
 
 postrunif () 
 {
-  # postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
-  # $1 = "Ничего не нужно делать" $2 = "Nothing to do" $3 = "there is nothing to do" $4= "делать больше нечего" $5 = "Нет заданий"
+  # postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
+  # $1 = "Ничего не нужно делать" $2 = "Nothing to do" $3 = "there is nothing to do" $4= "делать больше нечего" $5 = "Нет заданий" $6 = "Ошибка авторизации"
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
+
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$1" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$2" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$6" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep "$3" > /dev/null ; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep "$4" > /dev/null ; then rm $HOME/upgrade.yay; fi; fi
   if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep "$4" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
@@ -240,7 +242,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # echo -e "\n"; read -n 1 -p "Обновить flatpak?  [y/N]: " flat;
   # if [[ "$flat" = [yY] ]]; then echo -e "\n"; flatpak update; echo -e "\n"; fi
   # Проверка необходимости постдействий обновления из репозиториев ---------------------------
-  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
+  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
     echo -e "\n"; read -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
     if [[ "$kerny" = [yYlLдД] ]]; then
@@ -279,7 +281,7 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; read -n 1 -p "Обновить пакеты из AUR? [y/N]: " updaur;
 if [[ "$updaur" = [yYlLдД] ]]; then
   updatep AUR --aur --aur
-  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий"
+  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
   # --------------------------------------------------------------------------------------------
   # Проверка необходимости постдействий после обновлений AUR -----------------------------------
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
