@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.11.36
+# Версия скрипта 1.12.37
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -113,17 +113,19 @@ reqt ()
 
 updatep ()
 {
-  # 8 Функция обновления пакетов чере pamac $1 = репозиториев $2 = --no-aur $3 = --repo $4 = --enable-downgrade 
-  #                                         $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
+  # 8 Функция обновления пакетов через pamac $1 = репозиториев $2 = --no-aur $3 = --repo $4 = --enable-downgrade 
+  #                                          $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i $HOME/upgrade.pamac; 
   enter libnotify libcanberra sound-theme-freedesktop
+  adinsta
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i $HOME/upgrade.pamac;
   fi
   enter libnotify libcanberra sound-theme-freedesktop
+  adinsta
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
@@ -196,6 +198,22 @@ postrun ()
     # Поиск и уаление сирот
     syrot
     #rkhunt
+}
+
+adinsta ()
+{
+  # 12 Функция доустановки отсутствующей зависимости
+  # $1 = название пакета
+  echo -e "\n"; read -n 1 -p "Установить отсутствующие зависимости? [y/N]: " adinst;
+  if [[ "$adinst" = [yYlLдД] ]]; then
+    echo -e "\n"; read -p "Введите название пакета и нажмите Enter? : " sai;
+    #sai="$1"
+    pamac search aur $sai
+    echo -e "\n"; read -n 1 -p "Установить из репозиториев? [y/N]: " adinstr;
+    if [[ "$adinstr" = [yYlLдД] ]]; then pamac install $sai ; fi
+    echo -e "\n"; read -n 1 -p "Установить из AUR? [y/N]: " adinsta;
+    if [[ "$adinsta" = [yYlLдД] ]]; then pamac build $sai ; fi
+  fi
 }
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
