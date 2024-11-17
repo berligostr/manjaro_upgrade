@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.12.37
+# Версия скрипта 1.12.38
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -208,7 +208,7 @@ adinsta ()
   if [[ "$adinst" = [yYlLдД] ]]; then
     echo -e "\n"; read -p "Введите название пакета и нажмите Enter? : " sai;
     #sai="$1"
-    pamac search aur $sai
+    pamac search --aur $sai
     echo -e "\n"; read -n 1 -p "Установить из репозиториев? [y/N]: " adinstr;
     if [[ "$adinstr" = [yYlLдД] ]]; then pamac install $sai ; fi
     echo -e "\n"; read -n 1 -p "Установить из AUR? [y/N]: " adinsta;
