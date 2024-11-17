@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.12.38
+# Версия скрипта 1.12.39
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -204,15 +204,18 @@ adinsta ()
 {
   # 12 Функция доустановки отсутствующей зависимости
   # $1 = название пакета
-  echo -e "\n"; read -n 1 -p "Установить отсутствующие зависимости? [y/N]: " adinst;
-  if [[ "$adinst" = [yYlLдД] ]]; then
-    echo -e "\n"; read -p "Введите название пакета и нажмите Enter? : " sai;
-    #sai="$1"
-    pamac search --aur $sai
-    echo -e "\n"; read -n 1 -p "Установить из репозиториев? [y/N]: " adinstr;
-    if [[ "$adinstr" = [yYlLдД] ]]; then pamac install $sai ; fi
-    echo -e "\n"; read -n 1 -p "Установить из AUR? [y/N]: " adinsta;
-    if [[ "$adinsta" = [yYlLдД] ]]; then pamac build $sai ; fi
+  postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
+  if compgen -G "$HOME/upgrade.*" > /dev/null; then
+    echo -e "\n"; read -n 1 -p "Установить отсутствующие зависимости? [y/N]: " adinst;
+    if [[ "$adinst" = [yYlLдД] ]]; then
+      echo -e "\n"; read -p "Введите название пакета и нажмите Enter? : " sai;
+      #sai="$1"
+      pamac search --aur $sai
+      echo -e "\n"; read -n 1 -p "Установить из репозиториев? [y/N]: " adinstr;
+      if [[ "$adinstr" = [yYlLдД] ]]; then pamac install $sai ; fi
+      echo -e "\n"; read -n 1 -p "Установить из AUR? [y/N]: " adinsta;
+      if [[ "$adinsta" = [yYlLдД] ]]; then pamac build $sai ; fi
+    fi
   fi
 }
 # Конец описания функций скрипта
