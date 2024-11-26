@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.12.41
+# Версия скрипта 1.12.42
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -44,22 +44,25 @@ pacdiffmeld ()
     echo -e "\nПроверка наличия резервных копий conf.pacsave и conf.pacnew"
     echo -e "Файлы conf.pacsave можно удалить, если эти настройки больше не нужны"
     ifpac="$(sudo find /etc -name '*.pacnew' -o -name '*.pacsave')"
-    if [ -n "${ifpac}" ] ; then sudo find /etc -name '*.pacnew' -o -name '*.pacsave' ;
-                           else echo -e "Резервных копий conf.pacsave и conf.pacnew нет" ; fi 
-    echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
-    if [[ "$diff" = [yYlLдД] ]]; then 
-      package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-      if [ -n "${check}" ] ; 
-        then
-          echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
-          if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
-            then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
-            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
+    if [ -n "${ifpac}" ] ; 
+      then 
+        sudo find /etc -name '*.pacnew' -o -name '*.pacsave' ;
+        echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
+        if [[ "$diff" = [yYlLдД] ]]; then 
+          package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+          if [ -n "${check}" ] ; 
+            then
+              echo -e "\n"; read -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
+              if [[ "$difft" = "" || "$difft" = [yYlLдД] ]]; 
+                then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
+                else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
+              fi
+            else
+              echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
           fi
-        else
-          echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
-      fi
-    fi
+        fi
+      else echo -e "Резервных копий conf.pacsave и conf.pacnew нет" ; 
+    fi 
     #Конец условия Сравнить конфиги pacnew?
 }
 
