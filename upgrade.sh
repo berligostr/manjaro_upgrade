@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.12.40
+# Версия скрипта 1.12.41
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -41,9 +41,11 @@ enter ()
 pacdiffmeld ()
 {
   # 3 Функция Сравнить конфиги pacnew
-    echo -e "\nВ системе остались резервные копии conf.pacsave и conf.pacnew"
-    ech0 -e "Файлы conf.pacsave можноудалить, если эти настройки больше не нужны"
-    sudo find /etc -name '*.pacnew' -o -name '*.pacsave'
+    echo -e "\nПроверка наличия резервных копий conf.pacsave и conf.pacnew"
+    echo -e "Файлы conf.pacsave можно удалить, если эти настройки больше не нужны"
+    ifpac="$(sudo find /etc -name '*.pacnew' -o -name '*.pacsave')"
+    if [ -n "${ifpac}" ] ; then sudo find /etc -name '*.pacnew' -o -name '*.pacsave' ;
+                           else echo -e "Резервных копий conf.pacsave и conf.pacnew нет" ; fi 
     echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
     if [[ "$diff" = [yYlLдД] ]]; then 
       package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
