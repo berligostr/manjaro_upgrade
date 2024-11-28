@@ -41,6 +41,9 @@ enter ()
 pacdiffmeld ()
 {
   # 3 Функция Сравнить конфиги pacnew
+  # ifps="$(find /etc -name '*.pacsave' 2>dev/null)"
+  # for i in "${ifps[@]}"; do echo "$i"; done
+  # вместо echo "$i" подставить запрос на просмотр и/или удаление файла *.pacsave
     echo -e "\nПроверка наличия резервных копий conf.pacsave и conf.pacnew"
     echo -e "Файлы conf.pacsave можно удалить, если эти настройки больше не нужны"
     ifpac="$(sudo find /etc -name '*.pacnew' -o -name '*.pacsave')"
