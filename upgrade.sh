@@ -1,7 +1,7 @@
 #!/bin/bash
-# Версия скрипта 1.12.43
+# Версия скрипта 1.13.44
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
-echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
+echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
 echo -e "Для полноценной работы скрипта необходимо установить следующие пакеты: pacman-contrib, "
 echo -e "rebuild-detector, timeshift, timeshift-autosnap-manjaro, yay, meld, needrestart, thunar, "
@@ -15,7 +15,7 @@ pack ()
   # 1 Функция проверки наличия и установки пакета
   for i in "$@" ; do
     package="$i"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
-    if [ -n "${check}" ] ; then echo -e "Пакет $i уже установлен" ; else echo -e "Устанавливается пакет $i " ; pamac install --no-confirm $i ; fi
+    if [ -n "${check}" ] ; then echo -e "\nПакет $i уже установлен" ; else echo -e "\nУстанавливается пакет $i " ; pamac install "$i" ; fi
   done
 }
 
@@ -43,8 +43,10 @@ enter ()
 pacdiffmeld ()
 {
   # 3 Функция Сравнить конфиги pacnew
+  # Обработка черезстрочного массива
   # ifps="$(find /etc -name '*.pacsave' 2>/dev/null)"
   # for i in "${ifps[@]}"; do echo "$i"; done
+  # Обработка однострочного масства
   # func () { for i in "$@" ; do echo "$i" ; done; }
   # вместо echo "$i" подставить запрос на просмотр и/или удаление файла *.pacsave
     echo -e "\nПроверка наличия резервных копий conf.pacsave и conf.pacnew"
@@ -76,9 +78,9 @@ pacdiffmeld ()
         if [[ "$pacs" = [yYlLдД] ]]; then
           for i in "${ifpacs[@]}"; do 
             echo -e "\n"; read -n 1 -p "Просмотреть файл $i ? [y/N]: " paci ; 
-            if [[ "$paci" = [yYlLдД] ]]; then sudo nano $i ; fi
+            if [[ "$paci" = [yYlLдД] ]]; then sudo nano "$i" ; fi
             echo -e "\n"; read -n 1 -p "Удалить файл $i ? [y/N]: " pacd ;
-            if [[ "$pacd" = [yYlLдД] ]]; then sudo rm -i $i ; fi
+            if [[ "$pacd" = [yYlLдД] ]]; then sudo rm -i "$i" ; fi
           done
         fi
       else echo -e "Резервных копий .pacsave нет" ;
@@ -135,7 +137,7 @@ reqt ()
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
     # shellcheck disable=SC2046
-    if [[ "$uqtaq" = [yYlLдД] ]]; then echo -e "\n"; ( yay -S --rebuild $(pacman -Qmt | grep ^qt) ) |& tee -i $HOME/upgrade.yay ; fi
+    if [[ "$uqtaq" = [yYlLдД] ]]; then echo -e "\n"; ( yay -S --rebuild $(pacman -Qmt | grep ^qt) ) |& tee -i "$HOME/upgrade.yay" ; fi
   fi
 }
 
@@ -145,12 +147,12 @@ updatep ()
   #                                          $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i $HOME/upgrade.pamac; 
+  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i "$HOME/upgrade.pamac" ; 
   enter libnotify libcanberra sound-theme-freedesktop
   adinsta
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
-    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i $HOME/upgrade.pamac;
+    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
   fi
   enter libnotify libcanberra sound-theme-freedesktop
   adinsta
@@ -159,9 +161,9 @@ updatep ()
     echo -e "\n"; read -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; then
       echo -e "\n"; read -n 1 -p "Обновить через yay? [y/N]: " yayupd;
-      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; ( stdbuf -e 0 -o 0 bash -c "yay -Syyuu $3 " ) |& tee -i $HOME/upgrade.yay; fi
+      if [[ "$yayupd" = [yYlLдД] ]]; then echo -e "\n"; ( stdbuf -e 0 -o 0 bash -c "yay -Syyuu $3 " ) |& tee -i "$HOME/upgrade.yay" ; fi
       echo -e "\n"; read -n 1 -p "Обновить через paru? [y/N]: " parupd;
-      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; ( stdbuf -e 0 -o 0 bash -c "paru -Syyuu $3 " ) |& tee -i $HOME/upgrade.paru; fi
+      if [[ "$parupd" = [yYlLдД] ]]; then echo -e "\n"; ( stdbuf -e 0 -o 0 bash -c "paru -Syyuu $3 " ) |& tee -i "$HOME/upgrade.paru" ; fi
     fi
     # Проверка необходимости пересборки Qt пакетов
     # Функция пересборки пакетов Qt
@@ -174,12 +176,12 @@ updatep ()
 rkhunt ()
 {
   # 9 Функция Создание исполняемого файла для запуска rkhunter
-  if [ ! -f $HOME/my_scripts/rkhunter.sh ]; then 
-    mkdir -p $HOME/my_scripts
-    touch $HOME/my_scripts/rkhunter.sh
-    echo "#!/bin/bash " >> $HOME/my_scripts/rkhunter.sh
-    echo "sudo rkhunter --check --skip-keypress --update --report-warnings-only 2> /dev/null " >> $HOME/my_scripts/rkhunter.sh
-    chmod +x $HOME/my_scripts/rkhunter.sh
+  if [ ! -f "$HOME/my_scripts/rkhunter.sh" ]; then 
+    mkdir -p "$HOME/my_scripts"
+    touch "$HOME/my_scripts/rkhunter.sh"
+    echo "#!/bin/bash " >> "$HOME/my_scripts/rkhunter.sh"
+    echo "sudo rkhunter --check --skip-keypress --update --report-warnings-only 2> /dev/null " >> "$HOME/my_scripts/rkhunter.sh"
+    chmod +x "$HOME/my_scripts/rkhunter.sh"
   fi
   # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
   package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -187,7 +189,7 @@ rkhunt ()
     then
       echo -e "\n"; read -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
       if [[ "$rkh" = [yYlLдД] ]]; then echo -e "\n";
-        $HOME/my_scripts/rkhunter.sh ; 
+        "$HOME/my_scripts/rkhunter.sh" ; 
         enter libnotify libcanberra sound-theme-freedesktop
         echo -e "\n"; read -n 1 -p "Все в порядке? Создать базу данных для rkhunter? [y/N]: " rkhb; 
         if [[ "$rkhb" = [yYlLдД] ]]; then echo -e "\n"; sudo rkhunter --propupd 2> /dev/null ; fi
@@ -201,14 +203,14 @@ postrunif ()
   # $1 = "Ничего не нужно делать" $2 = "Nothing to do" $3 = "there is nothing to do" $4= "делать больше нечего" $5 = "Нет заданий" $6 = "Ошибка авторизации"
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
 
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$1" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$2" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat $HOME/upgrade.pamac | grep "$6" > /dev/null ; then rm $HOME/upgrade.pamac; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep "$3" > /dev/null ; then rm $HOME/upgrade.yay; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat $HOME/upgrade.yay | grep "$4" > /dev/null ; then rm $HOME/upgrade.yay; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep "$4" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep "$5" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat $HOME/upgrade.paru | grep "$3" > /dev/null ; then rm $HOME/upgrade.paru; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$1" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$2" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
+  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$6" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
+  if [[ -f $HOME/upgrade.yay ]]; then if cat "$HOME/upgrade.yay" | grep "$3" > /dev/null ; then rm "$HOME/upgrade.yay" ; fi; fi
+  if [[ -f $HOME/upgrade.yay ]]; then if cat "$HOME/upgrade.yay" | grep "$4" > /dev/null ; then rm "$HOME/upgrade.yay" ; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$4" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$5" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
+  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$3" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
   # --------------------------------------------------------------------------------------------
 }
 
@@ -238,13 +240,21 @@ adinsta ()
     if [[ "$adinst" = [yYlLдД] ]]; then
       echo -e "\n"; read -p "Введите название пакета и нажмите Enter? : " sai;
       #sai="$1"
-      pamac search --aur $sai
+      pamac search --aur "$sai"
       echo -e "\n"; read -n 1 -p "Установить из репозиториев? [y/N]: " adinstr;
-      if [[ "$adinstr" = [yYlLдД] ]]; then pamac install $sai ; fi
+      if [[ "$adinstr" = [yYlLдД] ]]; then pamac install "$sai" ; fi
       echo -e "\n"; read -n 1 -p "Установить из AUR? [y/N]: " adinsta;
-      if [[ "$adinsta" = [yYlLдД] ]]; then pamac build $sai ; fi
+      if [[ "$adinsta" = [yYlLдД] ]]; then pamac build "$sai" ; fi
     fi
   fi
+}
+
+delfile ()
+{
+  # 13 Функция удаления файла логов
+  for i in "$@" ; do  
+    if [[ -f $HOME/$i ]]; then rm "$HOME/$i" ; fi
+  done;
 }
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
@@ -255,7 +265,8 @@ if [[ "$inst" = [yYlLдД] ]]; then
   #
   # Здесь будет возможность подключения и обновления антивируса
   # Запуск гуя timeshift для настройки
-  timeshift-launcher
+  echo -e "\n"; read -n 1 -p "Настроить timeshift? [y/N]: " tsh ;
+  if [[ "$tsh" = [yYlLдД] ]]; then timeshift-launcher ; fi
 fi
 # Необходимые пакеты установлены и настроены
 # ---------------------------------------------------------------------------------------------
@@ -271,8 +282,8 @@ if [ -n "${check}" ] ; then
     then
       echo -e "\n"; timesmount="$(df | grep "$(sudo timeshift --list | grep Device | awk '{ print $3 }')" | awk '{ print $6 }')"
       timesfile="$timesmount/timeshift/snapshots"
-      bekaplast=$(find $timesfile -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
-      echo -e "\n"; echo -e "Последний бэкап timeshift сделан: " $bekaplast ;
+      bekaplast=$(find "$timesfile" -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
+      echo -e "\n"; echo -e "Последний бэкап timeshift сделан: $bekaplast " ;
       package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
       if [ -n "${check}" ] ; then
         echo -e "\n"; read -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
@@ -313,7 +324,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
         echo -e "\n"; read -n 1 -p "По умолчанию rEFInd будет загружать $lini ? [y/N]: " lynin;
         if [[ "$lynin" = [yYlLдД] ]]; then 
           lin=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | head -n 1 | awk '{ print $2 }' | awk -F. '{ print "/boot/vmlinuz-"$1"."$2"-x86_64" }')
-          if [ -e $lin ]; then sudo touch -m $lin; fi
+          if [ -e "$lin" ]; then sudo touch -m "$lin" ; fi
         fi
       fi
     fi
@@ -344,9 +355,8 @@ if [ -n "${check}" ] ;
 fi
 echo -e "\n";
 # Удаление логов ------------------------------------------------------------------------------
-if [[ -f $HOME/upgrade.paru ]]; then rm $HOME/upgrade.paru; fi
-if [[ -f $HOME/upgrade.yay ]]; then rm $HOME/upgrade.yay; fi
-if [[ -f $HOME/upgrade.pamac ]]; then rm $HOME/upgrade.pamac; fi 
+delfile upgrade.paru upgrade.yay upgrade.pamac
+
 # В разработке
 # ---------------------------------------------------------------------------------------------
 # Создание скрипта обновления антивирусных баз
