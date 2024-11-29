@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.12.42
+# Версия скрипта 1.12.43
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "Этот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -13,8 +13,10 @@ echo -e "Скрипт будет работать и без них, только
 pack () 
 {
   # 1 Функция проверки наличия и установки пакета
-  package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
-  if [ -n "${check}" ] ; then echo -e "$1 установлен" ; else pamac install --no-confirm $1 ; fi
+  for i in "$@" ; do
+    package="$i"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
+    if [ -n "${check}" ] ; then echo -e "Пакет $i уже установлен" ; else echo -e "Устанавливается пакет $i " ; pamac install --no-confirm $i ; fi
+  done
 }
 
 enter ()
@@ -41,15 +43,17 @@ enter ()
 pacdiffmeld ()
 {
   # 3 Функция Сравнить конфиги pacnew
-  # ifps="$(find /etc -name '*.pacsave' 2>dev/null)"
+  # ifps="$(find /etc -name '*.pacsave' 2>/dev/null)"
   # for i in "${ifps[@]}"; do echo "$i"; done
+  # func () { for i in "$@" ; do echo "$i" ; done; }
   # вместо echo "$i" подставить запрос на просмотр и/или удаление файла *.pacsave
     echo -e "\nПроверка наличия резервных копий conf.pacsave и conf.pacnew"
     echo -e "Файлы conf.pacsave можно удалить, если эти настройки больше не нужны"
-    ifpac="$(sudo find /etc -name '*.pacnew' -o -name '*.pacsave')"
-    if [ -n "${ifpac}" ] ; 
+    ifpacn="$(sudo find /etc -name '*.pacnew')"
+    ifpacs="$(sudo find /etc -name '*.pacsave')"
+    if [ -n "${ifpacn}" ] ; 
       then 
-        sudo find /etc -name '*.pacnew' -o -name '*.pacsave' ;
+        sudo find /etc -name '*.pacnew' ;
         echo -e "\n"; read -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
         if [[ "$diff" = [yYlLдД] ]]; then 
           package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
@@ -60,12 +64,25 @@ pacdiffmeld ()
                 then echo -e "\n"; sudo DIFFPROG=meld pacdiff; 
                 else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff; 
               fi
-            else
-              echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
+            else echo -e "\n"; sudo DIFFPROG=vimdiff pacdiff;
           fi
         fi
-      else echo -e "Резервных копий conf.pacsave и conf.pacnew нет" ; 
+      else echo -e "Резервных копий .pacnew нет" ; 
     fi 
+    if [ -n "${ifpacs}" ] ;
+      then
+        sudo find /etc -name '*.pacsave'
+        echo -e "\n"; read -n 1 -p "Просмотреть и/или удалить конфиги .pacsave ? [y/N]: " pacs ;
+        if [[ "$pacs" = [yYlLдД] ]]; then
+          for i in "${ifpacs[@]}"; do 
+            echo -e "\n"; read -n 1 -p "Просмотреть файл $i ? [y/N]: " paci ; 
+            if [[ "$paci" = [yYlLдД] ]]; then sudo nano $i ; fi
+            echo -e "\n"; read -n 1 -p "Удалить файл $i ? [y/N]: " pacd ;
+            if [[ "$pacd" = [yYlLдД] ]]; then sudo rm -i $i ; fi
+          done
+        fi
+      else echo -e "Резервных копий .pacsave нет" ;
+    fi
     #Конец условия Сравнить конфиги pacnew?
 }
 
@@ -233,9 +250,7 @@ adinsta ()
 # ----------------------------------------------------------------------------------------
 echo -e "\n"; read -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
-  pack pacman-contrib ; pack rebuild-detector ; pack timeshift ; pack timeshift-autosnap-manjaro ;
-  pack yay ; pack meld ; pack needrestart ; pack thunar ; pack libnotify ; pack libcanberra ;
-  pack sound-theme-freedesktop ;
+  pack pacman-contrib rebuild-detector timeshift timeshift-autosnap-manjaro yay meld needrestart thunar libnotify libcanberra sound-theme-freedesktop ;
   #pack paru-bin ;  
   #
   # Здесь будет возможность подключения и обновления антивируса
