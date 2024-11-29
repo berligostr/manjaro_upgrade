@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.13.44
+# Версия скрипта 1.13.45
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -19,25 +19,28 @@ pack ()
   done
 }
 
+check ()
+{
+  # Функция проверки наличия пакета
+  for i in "$@" ; do 
+    package="$i"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")"; 
+    checks="$checks$check"; 
+  done ; 
+  echo "$checks";
+}
 enter ()
 {
   # 2 Функция ожидания нажатия клавиши $1 = libnotify $2 = libcanberra $3 = sound-theme-freedesktop
   echo -e "\n"; echo "Нажмите клавишу Enter, чтобы продолжить"
-  package="$1"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-  if [ -n "${check}" ] ; then 
-    package="$2"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
-    if [ -n "${check}" ] ; then
-      package="$3"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";   
-      if [ -n "${check}" ] ; then
-        # shellcheck disable=SC2034
-        while true; do read -t 1 variable <&1 ; 
-          if [ $? = 0 ] ; then break ; else 
-            notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
-          fi ; 
-        done
-      fi ;
-    fi ; 
-  fi
+  check=$(check libnotify libcanberra sound-theme-freedesktop )
+  # shellcheck disable=SC2034
+  while true; do read -t 1 -n 1 key <&1 ; 
+    if [ $? = 0 ] ; then break ; else 
+      if [ -n "${check}" ] ; then 
+        notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
+      fi
+    fi ;
+  done
 }
 
 pacdiffmeld ()
@@ -148,13 +151,13 @@ updatep ()
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i "$HOME/upgrade.pamac" ; 
-  enter libnotify libcanberra sound-theme-freedesktop
+  enter
   adinsta
   echo -e "\n"; read -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then 
     ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
   fi
-  enter libnotify libcanberra sound-theme-freedesktop
+  enter
   adinsta
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
