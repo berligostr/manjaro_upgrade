@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.13.45
+# Версия скрипта 1.13.46
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -205,15 +205,11 @@ postrunif ()
   # postrun "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
   # $1 = "Ничего не нужно делать" $2 = "Nothing to do" $3 = "there is nothing to do" $4= "делать больше нечего" $5 = "Нет заданий" $6 = "Ошибка авторизации"
   # 10 Функция Проверки необходимости постдействий после обновлений ---------------------------------------
-
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$1" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$2" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
-  if [[ -f $HOME/upgrade.pamac ]]; then if cat "$HOME/upgrade.pamac" | grep "$6" > /dev/null ; then rm "$HOME/upgrade.pamac" ; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat "$HOME/upgrade.yay" | grep "$3" > /dev/null ; then rm "$HOME/upgrade.yay" ; fi; fi
-  if [[ -f $HOME/upgrade.yay ]]; then if cat "$HOME/upgrade.yay" | grep "$4" > /dev/null ; then rm "$HOME/upgrade.yay" ; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$4" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$5" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
-  if [[ -f $HOME/upgrade.paru ]]; then if cat "$HOME/upgrade.paru" | grep "$3" > /dev/null ; then rm "$HOME/upgrade.paru" ; fi; fi
+  for i in "$@" ; do  
+    if grep -Rnw "$HOME/upgrade.pamac" -e "$i" &>/dev/null ; then rm "$HOME/upgrade.pamac" &>/dev/null ; fi
+    if grep -Rnw "$HOME/upgrade.yay" -e "$i" &>/dev/null ; then rm "$HOME/upgrade.yay" &>/dev/null ; fi
+    if grep -Rnw "$HOME/upgrade.paru" -e "$i" &>/dev/null ; then rm "$HOME/upgrade.paru" &>/dev/null ; fi
+  done;
   # --------------------------------------------------------------------------------------------
 }
 
