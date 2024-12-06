@@ -268,9 +268,9 @@ drweb ()
   # 14 Функция проверки установки антивируса drweb и отключения SpIDer Gate
   # $1 = Yes, No Показывает что надо сделать, вкл или выкл SpIDer Gate
   #Проверка наличия установки drweb
-  echo -e "\nDrWeb SpIDer Gate $1 "
-  if [ -f /opt/drweb.com/bin/drweb-ctl ]; then
+  if [ -f /opt/drweb.com/bin/drweb-ctl ]; then 
   # Показать настройку
+    echo -e "\nDrWeb SpIDer Gate $1 "
     sg=$(drweb-ctl cfshow LinuxFirewall.OutputDivertEnable | awk '{ print $3 }')
     if [[ ! $sg == "$1" ]]; then sudo drweb-ctl cfset LinuxFirewall.OutputDivertEnable "$1" ; fi
   fi
