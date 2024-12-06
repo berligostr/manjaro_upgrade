@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.13.47
+# Версия скрипта 1.13.48
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -150,12 +150,17 @@ updatep ()
   # 8 Функция обновления пакетов через pamac $1 = репозиториев $2 = --no-aur $3 = --repo $4 = --enable-downgrade 
   #                                          $1 = AUR          $2 = --aur    $3 = --aur  $4 = '' 
   echo -e "\n"; echo -e "Будет произведено обновление пакетов из $1 !"; 
+  echo -e "\n"; read -r -n 1 -p "Обновить зеркала pacman? [y/N]: " mirr; echo -e "\n";
+  if [[ "$mirr" = [yYlLдД] ]]; then sudo pacman-mirrors --fasttrack ; fi
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i "$HOME/upgrade.pamac" ; 
   enter
   adinsta
   echo -e "\n"; read -r -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
-  if [[ "$update" = [yYlLдД] ]]; then 
+  if [[ "$update" = [yYlLдД] ]]; then
+    #sudo pacman-mirrors --fasttrack 
+    echo -e "\n"; read -r -n 1 -p "Обновить зеркала pacman? [y/N]: " mirr; echo -e "\n";
+    if [[ "$mirr" = [yYlLдД] ]]; then sudo pacman-mirrors --fasttrack ; fi
     ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
   fi
   enter
@@ -317,10 +322,12 @@ if [[ "$updrep" = [yYlLдД] ]]; then
     # Устранение недоразуменя загрузки старого ядра через rEFInd
     package="refind"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; then
+      echo -e "\n"; echo "В системе установлены следующие ядра (по умолчанию будет загружаться первое в списке ):"
+      #pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | sort -n -r -t'x' -k2,2
+      # shellcheck disable=SC2010
+      ls -t /boot | grep vmlinuz    
       echo -e "\n"; read -r -n 1 -p "Сделать загружаемым по умолчанию новое ядро? [y/N]: " lynn; 
       if [[ "$lynn" = [yYlLдД] ]]; then
-        echo -e "\n"; echo "В системе установлены следующие ядра:"
-        pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | sort -n -r -t'x' -k2,2
         lini=$(pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | sort -n -r -t'x' -k2,2 | head -n 1 | awk '{ print $2 }')
         echo -e "\n"; read -r -n 1 -p "По умолчанию rEFInd будет загружать $lini ? [y/N]: " lynin;
         if [[ "$lynin" = [yYlLдД] ]]; then 
