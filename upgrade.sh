@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.13.48
+# Версия скрипта 1.14.49
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -262,8 +262,28 @@ delfile ()
   done;
   echo -e "\nЛоги скрипта удалены"
 }
+
+drweb ()
+{
+  # 14 Функция проверки установки антивируса drweb и отключения SpIDer Gate
+  # $1 = Yes, No Показывает что надо сделать, вкл или выкл SpIDer Gate
+  #Проверка наличия установки drweb
+  echo -e "\nDrWeb SpIDer Gate $1 "
+  if [ -f /opt/drweb.com/bin/drweb-ctl ]; then
+  # Показать настройку
+    sg=$(drweb-ctl cfshow LinuxFirewall.OutputDivertEnable | awk '{ print $3 }')
+    if [[ ! $sg == "$1" ]]; then sudo drweb-ctl cfset LinuxFirewall.OutputDivertEnable "$1" ; fi
+  fi
+  #drweb-ctl cfshow LinuxFirewall.OutputDivertEnable | awk '{ print $3 }'
+  #drweb-ctl cfshow LinuxFirewall.OutputDivertEnable
+  # включить
+  #sudo drweb-ctl cfset LinuxFirewall.OutputDivertEnable Yes
+  # выключить
+  #sudo drweb-ctl cfset LinuxFirewall.OutputDivertEnable No
+}
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
+drweb No
 echo -e "\n"; read -r -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
 if [[ "$inst" = [yYlLдД] ]]; then 
   pack pacman-contrib rebuild-detector timeshift timeshift-autosnap-manjaro yay meld needrestart thunar libnotify libcanberra sound-theme-freedesktop ;
@@ -364,7 +384,7 @@ fi
 echo -e "\n";
 # Удаление логов ------------------------------------------------------------------------------
 delfile upgrade.paru upgrade.yay upgrade.pamac
-
+drweb Yes
 # В разработке
 # ---------------------------------------------------------------------------------------------
 # Создание скрипта обновления антивирусных баз
