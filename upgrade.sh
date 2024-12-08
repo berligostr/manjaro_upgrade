@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.14.49
+# Версия скрипта 1.14.50
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -155,7 +155,7 @@ updatep ()
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
   ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i "$HOME/upgrade.pamac" ; 
   enter
-  adinsta
+  if [[ "$1" == "AUR" ]]; then adinsta ; fi
   echo -e "\n"; read -r -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
   if [[ "$update" = [yYlLдД] ]]; then
     #sudo pacman-mirrors --fasttrack 
@@ -164,7 +164,7 @@ updatep ()
     ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
   fi
   enter
-  adinsta
+  if [[ "$1" == "AUR" ]]; then adinsta ; fi
   package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -r -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
