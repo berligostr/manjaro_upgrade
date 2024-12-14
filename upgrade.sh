@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.14.50
+# Версия скрипта 1.14.51
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -14,17 +14,18 @@ pack ()
 {
   # 1 Функция проверки наличия и установки пакета
   for i in "$@" ; do
-    package="$i"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";  
+    package="$i"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";  
     if [ -n "${check}" ] ; then echo -e "\nПакет $i уже установлен" ; else echo -e "\nУстанавливается пакет $i " ; pamac install "$i" ; fi
   done
 }
 
 check ()
 {
-  # Функция проверки наличия пакета
+  # Функция проверки наличия пакета выводит неустановленные пакеты
+  #arg=$#
   for i in "$@" ; do 
-    package="$i"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")"; 
-    checks="$checks$check"; 
+    package="$i"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}" | awk '{ print $1 }')"; check=${check##local/};
+    if [ -z "$check" ] ; then checks="$i $checks"; fi  
   done ; 
   echo "$checks";
 }
@@ -37,7 +38,7 @@ enter ()
   while true; do read -r -t 1 -n 1 key <&1 ; 
     # shellcheck disable=SC2181
     if [ $? = 0 ] ; then break ; else 
-      if [ -n "${check}" ] ; then 
+      if [ -z "${check}" ] ; then 
         notify-send -t 600 -i face-plain "   ВНИМАНИЕ! Обновление  " "   Требует <b>Вмешательства</b>  " ; canberra-gtk-play -i dialog-warning ; 
       fi
     fi ;
@@ -62,7 +63,7 @@ pacdiffmeld ()
         sudo find /etc -name '*.pacnew' ;
         echo -e "\n"; read -r -n 1 -p "Сравнить конфиги pacnew? [y/N]: " diff;
         if [[ "$diff" = [yYlLдД] ]]; then 
-          package="meld"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+          package="meld"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
           if [ -n "${check}" ] ; 
             then
               echo -e "\n"; read -r -n 1 -p "Сравнить в meld(графика)? [Y/n]: " difft;
@@ -95,7 +96,7 @@ pacdiffmeld ()
 needrest ()
 { 
   # 4 Функция проверки сервисов для перезапуска
-  package="needrestart"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  package="needrestart"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
       echo -e "\n"; read -r -n 1 -p "Проверить сервисы для перезапуска? [y/N]: " restart;
@@ -137,7 +138,7 @@ syrot ()
 reqt ()
 {
   # 7 Функция пересборки пакетов Qt
-  package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  package="yay"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -r -n 1 -p "Пересобрать Qt пакеты из AUR? [y/N]: " uqtaq;
     # shellcheck disable=SC2046
@@ -165,7 +166,7 @@ updatep ()
   fi
   enter
   if [[ "$1" == "AUR" ]]; then adinsta ; fi
-  package="yay"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  package="yay"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; then
     echo -e "\n"; read -r -n 1 -p "Обновить пакеты из $1 через AURхелперы yay или paru? [y/N]: " upda; 
     if [[ "$upda" = [yYlLдД] ]]; then
@@ -193,7 +194,7 @@ rkhunt ()
     chmod +x "$HOME/my_scripts/rkhunter.sh"
   fi
   # запуск rkhunter --propupd после изменения конфигурационных файлов или обновления ОС
-  package="rkhunter"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+  package="rkhunter"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
   if [ -n "${check}" ] ; 
     then
       echo -e "\n"; read -r -n 1 -p "Выполнить проверку rkhunter? [y/N]: " rkh; 
@@ -284,15 +285,18 @@ drweb ()
 # Конец описания функций скрипта
 # ----------------------------------------------------------------------------------------
 drweb No
-echo -e "\n"; read -r -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
-if [[ "$inst" = [yYlLдД] ]]; then 
-  pack pacman-contrib rebuild-detector timeshift timeshift-autosnap-manjaro yay meld needrestart thunar libnotify libcanberra sound-theme-freedesktop ;
-  #pack paru-bin ;  
-  #
-  # Здесь будет возможность подключения и обновления антивируса
-  # Запуск гуя timeshift для настройки
-  echo -e "\n"; read -r -n 1 -p "Настроить timeshift? [y/N]: " tsh ;
-  if [[ "$tsh" = [yYlLдД] ]]; then timeshift-launcher ; fi
+check=$(check pacman-contrib rebuild-detector timeshift timeshift-autosnap-manjaro yay meld needrestart thunar libnotify libcanberra sound-theme-freedesktop )
+if [ -n "${check}" ] ; then
+  echo -e "\n"; read -r -n 1 -p "Установить отсутствующие пакеты и настроить бэкап timeshift? [y/N]: " inst;
+  if [[ "$inst" = [yYlLдД] ]]; then 
+    pack pacman-contrib rebuild-detector timeshift timeshift-autosnap-manjaro yay meld needrestart thunar libnotify libcanberra sound-theme-freedesktop ;
+    #pack paru-bin ;  
+    #
+    # Здесь будет возможность подключения и обновления антивируса
+    # Запуск гуя timeshift для настройки
+    echo -e "\n"; read -r -n 1 -p "Настроить timeshift? [y/N]: " tsh ;
+    if [[ "$tsh" = [yYlLдД] ]]; then timeshift-launcher ; fi
+  fi
 fi
 # Необходимые пакеты установлены и настроены
 # ---------------------------------------------------------------------------------------------
@@ -302,7 +306,7 @@ if [[ -f /var/lib/pacman/db.lck ]]; then echo -e "\n"; sudo rm /var/lib/pacman/d
 echo -e "\n"; echo -e "Проверка наличия обновлений:"; echo -e "\n"; pamac checkupdates -a
 # ---------------------------------------------------------------------------------------------
 # Проверка состояни бэкапа timeshift
-package="timeshift"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+package="timeshift"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; then
   if ! pgrep 'timeshift'>null; 
     then
@@ -310,7 +314,7 @@ if [ -n "${check}" ] ; then
       timesfile="$timesmount/timeshift/snapshots"
       bekaplast=$(find "$timesfile" -mindepth 1 -maxdepth 1 -printf '%P\n' | sort -r | head -n 1)
       echo -e "\n"; echo -e "Последний бэкап timeshift сделан: $bekaplast " ;
-      package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+      package="timeshift-autosnap-manjaro"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
       if [ -n "${check}" ] ; then
         echo -e "\n"; read -r -n 1 -p "Сделать бэкап timeshift перед обновлением? [y/N]: " bekap; 
         if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=true/skipAutosnap=false/g' /etc/timeshift-autosnap.conf; fi
@@ -333,14 +337,14 @@ if [[ "$updrep" = [yYlLдД] ]]; then
       echo -e "\n"; echo "В системе установлены следующие ядра:"
       pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
       echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
-      package="thunar"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+      package="thunar"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
       if [ -n "${check}" ] ; 
         then
         cd /usr/lib/modules/ || exit; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
       fi
     fi
     # Устранение недоразуменя загрузки старого ядра через rEFInd
-    package="refind"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+    package="refind"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; then
       echo -e "\n"; echo "В системе установлены следующие ядра (по умолчанию будет загружаться первое в списке ):"
       #pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]" | sort -n -r -t'x' -k2,2
@@ -376,7 +380,7 @@ if [[ "$updaur" = [yYlLдД] ]]; then
 fi
 # Конец условия Необходимости постобработки после обновления AUR -------------------------------------------------
 # Конец условия Обновить установленные пакеты?
-package="timeshift-autosnap-manjaro"; check="$(pacman -Qs --color always "${package}" | grep "local" | grep "${package}")";
+package="timeshift-autosnap-manjaro"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
 if [ -n "${check}" ] ; 
   then
     if [[ "$bekap" = [yYlLдД] ]]; then sudo sed -i 's/skipAutosnap=false/skipAutosnap=true/g' /etc/timeshift-autosnap.conf; fi
