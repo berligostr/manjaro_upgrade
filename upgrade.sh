@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.14.53
+# Версия скрипта 1.14.54
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -157,7 +157,7 @@ updatep ()
   echo -e "\n"; read -r -n 1 -p "Обновить зеркала pacman? [y/N]: " mirr; echo -e "\n";
   if [[ "$mirr" = [yYlLдД] ]]; then sudo pacman-mirrors --fasttrack ; fi
   echo -e "\n"; echo -e "Если в процессе обновления пакетов терминал завис нужно нажать Ctrl+c"; echo -e "\n";
-  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Запись EOF'" ) |& tee -i "$HOME/upgrade.pamac" ; 
+  ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --no-confirm $4 $2 2> /dev/null && echo 'Если терминал завис, нажмите Ctrl+с. Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ; 
   enter
   if [[ "$1" == "AUR" ]]; then adinsta ; fi
   echo -e "\n"; read -r -n 1 -p "Нет обновлений? Принудительно обновить базы? [y/N]: " update; echo -e "\n";
@@ -165,7 +165,7 @@ updatep ()
     #sudo pacman-mirrors --fasttrack 
     echo -e "\n"; read -r -n 1 -p "Обновить зеркала pacman? [y/N]: " mirr; echo -e "\n";
     if [[ "$mirr" = [yYlLдД] ]]; then sudo pacman-mirrors --fasttrack ; fi
-    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Если выполнение скрипта остановилось, нажмите Ctrl+c. Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
+    ( stdbuf -e 0 -o 0 bash -c "pamac upgrade --force-refresh $4 $2 2> /dev/null && echo 'Если терминал завис, нажмите Ctrl+c. Запись EOF' " ) |& tee -i "$HOME/upgrade.pamac" ;
   fi
   enter
   if [[ "$1" == "AUR" ]]; then adinsta ; fi
