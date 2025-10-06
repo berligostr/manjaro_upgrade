@@ -1,5 +1,5 @@
 #!/bin/bash
-# Версия скрипта 1.14.55
+# Версия скрипта 1.14.56
 # Скрипт линейный = [1,2], количество функций = XX, версия сборки = XXX
 echo -e "\nЭтот скрипт проверяет наличие обновлений и обновляет систему с помощью pamac, yay и paru."
 echo -e "Скрипт сам установит необходимые пакеты, но вы можете сделать это самостоятельною "
@@ -335,17 +335,7 @@ if [[ "$updrep" = [yYlLдД] ]]; then
   # Проверка необходимости постдействий обновления из репозиториев ---------------------------
   postrunif "Ничего не нужно делать" "Nothing to do" "there is nothing to do" "делать больше нечего" "Нет заданий" "Ошибка авторизации"
   if compgen -G "$HOME/upgrade.*" > /dev/null; then 
-    echo -e "\n"; read -r -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
-    if [[ "$kerny" = [yYlLдД] ]]; then
-      echo -e "\n"; echo "В системе установлены следующие ядра:"
-      pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
-      echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
-      package="thunar"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
-      if [ -n "${check}" ] ; 
-        then
-        cd /usr/lib/modules/ || exit; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
-      fi
-    fi
+
     # Устранение недоразуменя загрузки старого ядра через rEFInd
     package="refind"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
     if [ -n "${check}" ] ; then
@@ -364,6 +354,17 @@ if [[ "$updrep" = [yYlLдД] ]]; then
       fi
     fi
     postrun
+    echo -e "\n"; read -r -n 1 -p "Проверить, есть ли лишние модули ядра? [y/N]: " kerny; 
+    if [[ "$kerny" = [yYlLдД] ]]; then
+      echo -e "\n"; echo "В системе установлены следующие ядра:"
+      pacman -Q | grep -E "linux[0-9]{2}(\s|[0-9])[^-]"
+      echo -e "\n"; echo "Возможно необходимо почистить каталог /usr/lib/modules/"
+      package="thunar"; check="$(pacman -Qs "${package}" | grep "local" | grep "${package}")";
+      if [ -n "${check}" ] ; 
+        then
+        cd /usr/lib/modules/ || exit; gksu dbus-run-session thunar /usr/lib/modules/ 2> /dev/null ;
+      fi
+    fi    
   fi
 fi
 # Конец условия Необходимости постобработки после обновления пакетов репозиториев --------------------------------
